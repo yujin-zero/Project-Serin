@@ -1,42 +1,4 @@
 import pygame
-import sys
-
-
-class Game:
-    def __init__(self):
-        pygame.init()
-        self.screen_width = 1300
-        self.screen_height = 800
-        self.screen = pygame.display.set_mode(
-            (self.screen_width, self.screen_height))
-        pygame.display.set_caption("밤의 어쩌구 세린")
-        self.bg_color = (230, 230, 230)
-        self.clock = pygame.time.Clock()
-        self.running = True
-        self.serin = Serin(self.screen_width // 2, self.screen_height // 2)
-
-    def run(self):
-        while self.running:
-            self._handle_events()
-            self._update()
-            self._draw()
-            self.clock.tick(60)
-
-        pygame.quit()
-        sys.exit()
-
-    def _handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-
-    def _update(self):
-        self.serin.update()
-
-    def _draw(self):
-        self.screen.fill(self.bg_color)
-        self.serin.draw(self.screen)
-        pygame.display.flip()
 
 
 class Serin:
@@ -62,7 +24,7 @@ class Serin:
         self.health_bar_width = self.rect.width // 2
         self.health_bar_height = 7
 
-    def update(self):
+    def update(self, boundary_width, boundary_height):
         keys = pygame.key.get_pressed()
         current_time = pygame.time.get_ticks()
 
@@ -88,14 +50,21 @@ class Serin:
         if keys[pygame.K_DOWN]:
             self.rect.y += self.speed
 
-    def draw(self, screen):
-        screen.blit(self.frames[self.frame_index], self.rect)
-        self._draw_health_bar(screen)
+        # 경계 설정
+        self.rect.x = max(
+            0, min(self.rect.x, boundary_width - self.rect.width))
+        self.rect.y = max(
+            0, min(self.rect.y, boundary_height - self.rect.height))
 
-    def _draw_health_bar(self, screen):
+    def draw(self, screen, camera_x, camera_y):
+        screen.blit(self.frames[self.frame_index],
+                    (self.rect.x - camera_x, self.rect.y - camera_y))
+        self._draw_health_bar(screen, camera_x, camera_y)
+
+    def _draw_health_bar(self, screen, camera_x, camera_y):
         # 체력바 위치 설정
-        health_bar_x = self.rect.x + self.rect.width * 0.25
-        health_bar_y = self.rect.y + self.rect.height - 15
+        health_bar_x = self.rect.x - camera_x + self.rect.width * 0.25
+        health_bar_y = self.rect.y - camera_y + self.rect.height - 15
 
         # 현재 체력 비율 계산
         health_ratio = self.health / self.max_health
@@ -107,8 +76,3 @@ class Serin:
         # 현재 체력 그리기
         pygame.draw.rect(screen, (0, 255, 0), (health_bar_x, health_bar_y,
                          current_health_bar_width, self.health_bar_height))
-
-
-if __name__ == "__main__":
-    game = Game()
-    game.run()
