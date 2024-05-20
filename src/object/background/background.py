@@ -10,20 +10,21 @@ class Background:
         self.background = pygame.image.load("etc/graphics/background/background.png")
         self.background_width, self.background_height = self.background.get_size()
         self.rect = self.background.get_rect()
+        print(self.background_width, self.background_height)
 
         self.player = player
 
         self.health_bar_width = self.player.rect.width // 2
         self.health_bar_height = 7
 
-    def draw(self, screen, camera_x, camera_y):
-        self.screen.blit(self.background, (-camera_x, -camera_y))
-        self._draw_health_bar(screen, camera_x, camera_y)
+    def draw(self, screen, camera):
+        self.screen.blit(self.background, (-camera.camera_rect.x, -camera.camera_rect.y))
+        self._draw_health_bar(screen, camera)
 
-    def _draw_health_bar(self,screen, camera_x, camera_y):
+    def _draw_health_bar(self,screen, camera):
         # 체력바 위치 설정
-        health_bar_x = self.player.rect.x + self.player.rect.width * 0.25 - camera_x
-        health_bar_y =self.player.rect.y + self.player.rect.height - 15 - camera_y
+        health_bar_x = self.player.rect.x - camera.camera_rect.x + self.player.rect.width * 0.25 
+        health_bar_y =self.player.rect.y - camera.camera_rect.y + self.player.rect.height - 15 
 
         # 현재 체력 비율 계산
         health_ratio = self.player.health / self.player.max_health

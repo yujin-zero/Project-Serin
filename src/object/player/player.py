@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-class Player:
+class Player(pygame.sprite.Sprite):
     def __init__(self, screen_width, screen_height):
         self.original_frames = [pygame.image.load(
             f'etc/graphics/player/idle/{i}.png') for i in range(1, 13)]
@@ -13,7 +13,7 @@ class Player:
         self.rect = self.frames[0].get_rect()
         self.rect.x = screen_width/2
         self.rect.y = screen_height/2
-        self.speed = 1
+        self.speed = 20
         self.frame_index = 0
         self.frame_count = 6
         self.frame_delay = 60
@@ -33,8 +33,7 @@ class Player:
     def draw(self, screen, camera_x, camera_y):
         screen.blit(self.frames[self.frame_index], (self.rect.x - camera_x, self.rect.y - camera_y))
 
-    def move(self, background_width, background_height):
-        keys = pygame.key.get_pressed()
+    def move(self, background_width, background_height, keys):
         current_time = pygame.time.get_ticks()
 
         if keys[pygame.K_LEFT]:
