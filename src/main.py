@@ -1,7 +1,6 @@
 import pygame
 import sys
 from controller.gameManager import GameManager
-
 class Main:
     def __init__(self):
         self.game_manager = GameManager()
