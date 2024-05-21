@@ -1,9 +1,6 @@
 import pygame
 import sys
-import random
-import math
 import spawn
-import monster
 import monster_squirrel
 import players
 
@@ -24,10 +21,6 @@ monster_spawner = spawn.MonsterSpawner(players.player, all_sprites, monsters)
 monster_spawner.add_monster_class(monster_squirrel.SquirrelMonster)
 # 다른 몬스터 클래스도 추가할 수 있음
 # monster_spawner.add_monster_class(OtherMonsterClass)
-
-
-
-
 
 
 # 게임 루프
