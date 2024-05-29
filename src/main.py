@@ -1,11 +1,12 @@
 import pygame
 import sys
-from Background import Background
-from Camera import Camera
-from Serin import Serin
-import spawn
-import monster_squirrel
-
+from Background import Background  # 배경 이미지를 다루는 모듈
+from Camera import Camera  # 카메라 모듈
+from Serin import Serin  # 플레이어 캐릭터 모듈
+import spawn  # 몬스터 스폰 모듈
+import monster_squirrel  # 다람쥐 몬스터 모듈
+import monster_BamBoo  # 대나무 몬스터 모듈
+import monster_Spirit  # 영혼 몬스터 모듈
 
 class Main:
     def __init__(self):
@@ -36,6 +37,10 @@ class Main:
             self.serin, self.all_sprites, self.monsters)
         self.monster_spawner.add_monster_class(
             monster_squirrel.SquirrelMonster)
+        self.monster_spawner.add_monster_class(
+            monster_BamBoo.BamBooMonster)
+        self.monster_spawner.add_monster_class(
+            monster_Spirit.SpiritMonster)
 
         # Serin을 전체 스프라이트 그룹에 추가
         self.all_sprites.add(self.serin)
@@ -45,8 +50,8 @@ class Main:
             self._handle_events()
             self._update()
             self._draw()
+            self._check_collisions()
             self.clock.tick(60)
-
         pygame.quit()
         sys.exit()
 
@@ -67,6 +72,13 @@ class Main:
             sprite.draw(self.screen, self.camera.x, self.camera.y)
         pygame.display.flip()
 
-
+    def _check_collisions(self):
+         for monster in self.monsters:
+            if self.serin.hitbox.colliderect(monster.hitbox):
+                self.serin.health -= 0.1#monster.power  # 몬스터의 공격력에 따라 체력 감소
+                if self.serin.health <= 0:
+                    self.serin.kill()
+                    #self.running=False
+                
 if __name__ == "__main__":
     Main().run()
