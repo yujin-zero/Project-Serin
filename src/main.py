@@ -50,7 +50,7 @@ class Main:
         self.max_exp = 100
         # 몬스터 잡은 카운트
         self.monster_kills = 0
-        self.kill_icon = pygame.image.load("./image/killIcon.png").convert_alpha()
+        self.kill_icon = pygame.image.load("./image/monster_kill_icon.png").convert_alpha()
         # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
@@ -112,7 +112,8 @@ class Main:
         bar_length = 1300  # 경험치 바 길이
         bar_height = 20   # 경험치 바 높이
         fill = 1300
-        #(self.exp / self.max_exp) * bar_length  # 채워질 길이 계산
+        #  채워질 길이 계산
+        # (self.exp / self.max_exp) * bar_length 
         outline_rect = pygame.Rect((self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
         fill_rect = pygame.Rect((self.screen_width - bar_length) // 2, 10, fill, bar_height)
         
@@ -137,7 +138,6 @@ class Main:
         self.screen.blit(self.coin, icon_rect)  # 먼저 이미지 그리기
         self.screen.blit(text_surface, text_rect)  # 그 다음 텍스트 그리기
 
-      
 
 if __name__ == "__main__":
     Main().run()
