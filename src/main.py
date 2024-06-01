@@ -6,6 +6,8 @@ from Camera import Camera
 from Serin import Serin
 import spawn
 import monster_squirrel
+from ui import Ui
+from Inventory import Inventory
 
 class Main:
     def __init__(self):
@@ -54,6 +56,8 @@ class Main:
         # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
+        self.inventory = Inventory()
+        self.ui = Ui(self.inventory, self.screen)
         
     
     def run(self):
@@ -76,6 +80,10 @@ class Main:
         self.camera.update(self.serin)
         self.monster_spawner.spawn_monster()
         self.all_sprites.update()
+        pygame.display.flip()
+        self.clock.tick(60)
+        
+
         
         # 여기 경험치 증가 조건 넣기
         # self.exp += 0.1
@@ -92,6 +100,8 @@ class Main:
         self._draw_exp_bar()
         self._draw_kill_count()
         self._draw_coin()
+        self.ui.draw()
+
 
         pygame.display.flip()
 
