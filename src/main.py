@@ -12,6 +12,7 @@ from ui import Ui
 from Inventory import Inventory
 from AppleWeapon import AppleWeapon  # 사과무기
 from DamageText import DamageText  # 데미지 표시
+from Gem import Gem  # 경험치
 
 
 class Main:
@@ -38,6 +39,7 @@ class Main:
 
         self.monsters = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
+        self.gems = pygame.sprite.Group()
         self.monster_spawner = spawn.MonsterSpawner(
             self.serin, self.all_sprites, self.monsters)
         self.monster_spawner.add_monster_class(
@@ -96,6 +98,7 @@ class Main:
         self.monster_spawner.spawn_monster()
         self.all_sprites.update()
         self.damage_texts.update()
+        self.gems.update()
         pygame.display.flip()
         self.clock.tick(60)
 
@@ -108,6 +111,8 @@ class Main:
         self.background.draw(self.screen, self.camera.x, self.camera.y)
         for sprite in self.all_sprites:
             sprite.draw(self.screen, self.camera.x, self.camera.y)
+        for gem in self.gems:
+            gem.draw(self.screen, self.camera.x, self.camera.y)
         for damage_text in self.damage_texts:
             self.screen.blit(damage_text.image, (damage_text.rect.x -
                              self.camera.x, damage_text.rect.y - self.camera.y))
@@ -136,8 +141,17 @@ class Main:
                 if monster.health <= 0:
                     monster.kill()
                     self.monster_kills += 1
-                    self.exp += 10  # 몬스터 처치 시 경험치 증가
+                    # self.exp += 10  # 몬스터 처치 시 경험치 증가
                     self.coin_count += 1  # 몬스터 처치 시 코인 증가
+                    gem = Gem(monster.rect.centerx, monster.rect.centery)
+                    self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
+                    self.all_sprites.add(gem)
+
+        # Serin과 보석의 충돌 체크
+        for gem in self.gems:
+            if self.serin.hitbox.colliderect(gem.rect):
+                self.exp += 10  # 보석 획득 시 경험치 증가
+                gem.kill()  # 보석 제거
 
     def _draw_clock(self):
 
@@ -154,9 +168,7 @@ class Main:
     def _draw_exp_bar(self):
         bar_length = 1300  # 경험치 바 길이
         bar_height = 20   # 경험치 바 높이
-        fill = 1300
-        #  채워질 길이 계산
-        # (self.exp / self.max_exp) * bar_length
+        fill = (self.exp / self.max_exp) * bar_length
         outline_rect = pygame.Rect(
             (self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
         fill_rect = pygame.Rect(
@@ -173,9 +185,9 @@ class Main:
         text_rect = text_surface.get_rect(
             top=50, right=self.screen_width - 200)
         icon_rect = self.kill_icon.get_rect(
-            top=45, left=text_rect.right + 10)  # 이미지를 텍스트 왼쪽에 위치시키고 약간의 여백을 두기
+            top=45, left=text_rect.right + 10)
 
-        self.screen.blit(self.kill_icon, icon_rect)  # 먼저 이미지 그리기
+        self.screen.blit(self.kill_icon, icon_rect)
         self.screen.blit(text_surface, text_rect)  # 그 다음 텍스트 그리기
 
     def _draw_coin(self):
@@ -183,11 +195,11 @@ class Main:
         text_surface = self.font.render(coin_count_text, True, (255, 255, 255))
         text_rect = text_surface.get_rect(
             top=50, right=self.screen_width - 100)
-        # 이미지를 텍스트 왼쪽에 위치시키고 약간의 여백을 두기
+
         icon_rect = self.coin.get_rect(top=29, left=text_rect.right-10)
 
-        self.screen.blit(self.coin, icon_rect)  # 먼저 이미지 그리기
-        self.screen.blit(text_surface, text_rect)  # 그 다음 텍스트 그리기
+        self.screen.blit(self.coin, icon_rect)
+        self.screen.blit(text_surface, text_rect)
 
 
 if __name__ == "__main__":
