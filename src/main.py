@@ -10,7 +10,8 @@ import monster_BamBoo  # 대나무 몬스터 모듈
 import monster_Spirit  # 영혼 몬스터 모듈
 from ui import Ui
 from Inventory import Inventory
-from AppleWeapon import AppleWeapon
+from AppleWeapon import AppleWeapon  # 사과무기
+from DamageText import DamageText  # 데미지 표시
 
 
 class Main:
@@ -72,6 +73,8 @@ class Main:
             self.serin, 100, 5, "./image/apple.png")
         self.all_sprites.add(self.apple_weapon)
 
+        self.damage_texts = pygame.sprite.Group()
+
     def run(self):
         while self.running:
             self._handle_events()
@@ -92,6 +95,7 @@ class Main:
         self.camera.update(self.serin)
         self.monster_spawner.spawn_monster()
         self.all_sprites.update()
+        self.damage_texts.update()
         pygame.display.flip()
         self.clock.tick(60)
 
@@ -104,6 +108,9 @@ class Main:
         self.background.draw(self.screen, self.camera.x, self.camera.y)
         for sprite in self.all_sprites:
             sprite.draw(self.screen, self.camera.x, self.camera.y)
+        for damage_text in self.damage_texts:
+            self.screen.blit(damage_text.image, (damage_text.rect.x -
+                             self.camera.x, damage_text.rect.y - self.camera.y))
 
         self._draw_clock()
         self._draw_exp_bar()
@@ -122,7 +129,10 @@ class Main:
                     self.running = False
 
             if self.apple_weapon.rect.colliderect(monster.hitbox):
-                monster.health -= 10  # 사과 무기의 공격력
+                damage = 10  # 사과 무기의 공격력
+                monster.health -= damage
+                self.damage_texts.add(DamageText(
+                    monster.rect.centerx, monster.rect.centery, damage))
                 if monster.health <= 0:
                     monster.kill()
                     self.monster_kills += 1
