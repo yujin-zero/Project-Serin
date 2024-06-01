@@ -6,6 +6,8 @@ from Camera import Camera
 from Serin import Serin
 import spawn
 import monster_squirrel
+import monster_BamBoo  # 대나무 몬스터 모듈
+import monster_Spirit  # 영혼 몬스터 모듈
 from ui import Ui
 from Inventory import Inventory
 
@@ -38,6 +40,10 @@ class Main:
             self.serin, self.all_sprites, self.monsters)
         self.monster_spawner.add_monster_class(
             monster_squirrel.SquirrelMonster)
+        self.monster_spawner.add_monster_class(
+            monster_BamBoo.BamBooMonster)
+        self.monster_spawner.add_monster_class(
+            monster_Spirit.SpiritMonster)
 
         # Serin을 전체 스프라이트 그룹에 추가
         self.all_sprites.add(self.serin)
@@ -65,8 +71,8 @@ class Main:
             self._handle_events()
             self._update()
             self._draw()
+            self._check_collisions()
             self.clock.tick(60)
-
         pygame.quit()
         sys.exit()
 
@@ -104,6 +110,15 @@ class Main:
 
 
         pygame.display.flip()
+
+    def _check_collisions(self):
+         for monster in self.monsters:
+            if self.serin.hitbox.colliderect(monster.hitbox):
+                self.serin.health -= 0.1#monster.power  # 몬스터의 공격력에 따라 체력 감소
+                if self.serin.health <= 0:
+                    self.serin.kill()
+                    #self.running=False
+                
 
     def _draw_clock(self):
         
