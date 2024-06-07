@@ -28,7 +28,6 @@ class Main:
         self.boundary_width = self.background.width
         self.boundary_height = self.background.height
 
-        # 세린을 맵의 정 가운데에 배치
         serin_start_x = self.boundary_width // 2
         serin_start_y = self.boundary_height // 2
         self.serin = Serin(serin_start_x, serin_start_y,
@@ -49,33 +48,28 @@ class Main:
         self.monster_spawner.add_monster_class(
             monster_Spirit.SpiritMonster)
 
-        # Serin을 전체 스프라이트 그룹에 추가
         self.all_sprites.add(self.serin)
 
-        # 타이머 초기화
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
         self.start_time = time.time()
 
-        # 경험치 바 초기화
         self.exp = 0
         self.max_exp = 100
-        # 몬스터 잡은 카운트
         self.monster_kills = 0
         self.kill_icon = pygame.image.load(
             "./image/monster_kill_icon.png").convert_alpha()
-        # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
         self.inventory = Inventory()
         self.ui = Ui(self.inventory, self.screen)
 
-        # 사과 무기 초기화
         self.apple_weapon = AppleWeapon(
             self.serin, 100, 5, "./image/apple.png")
-        self.all_sprites.add(self.apple_weapon)
-
         self.damage_texts = pygame.sprite.Group()
+
+        # test
+        self.inventory.add_item(self.apple_weapon)
 
     def run(self):
         while self.running:
@@ -99,11 +93,11 @@ class Main:
         self.all_sprites.update()
         self.damage_texts.update()
         self.gems.update()
+        if self.inventory.has_apple_weapon():
+            self.apple_weapon.update()
         pygame.display.flip()
         self.clock.tick(60)
 
-        # 여기 경험치 증가 조건 넣기
-        # self.exp += 0.1
         if self.exp >= self.max_exp:
             self.exp = 0
 
@@ -116,6 +110,8 @@ class Main:
         for damage_text in self.damage_texts:
             self.screen.blit(damage_text.image, (damage_text.rect.x -
                              self.camera.x, damage_text.rect.y - self.camera.y))
+        if self.inventory.has_apple_weapon():
+            self.apple_weapon.draw(self.screen, self.camera.x, self.camera.y)
 
         self._draw_clock()
         self._draw_exp_bar()
@@ -128,33 +124,30 @@ class Main:
     def _check_collisions(self):
         for monster in self.monsters:
             if self.serin.hitbox.colliderect(monster.hitbox):
-                self.serin.health -= 0.1  # monster.power  # 몬스터의 공격력에 따라 체력 감소
+                self.serin.health -= 0.1  # monster.power
                 if self.serin.health <= 0:
                     self.serin.kill()
                     self.running = False
 
-            if self.apple_weapon.rect.colliderect(monster.hitbox):
-                damage = 10  # 사과 무기의 공격력
+            if self.inventory.has_apple_weapon() and self.apple_weapon.rect.colliderect(monster.hitbox):
+                damage = 10
                 monster.health -= damage
                 self.damage_texts.add(DamageText(
                     monster.rect.centerx, monster.rect.centery, damage))
                 if monster.health <= 0:
                     monster.kill()
                     self.monster_kills += 1
-                    # self.exp += 10  # 몬스터 처치 시 경험치 증가
-                    self.coin_count += 1  # 몬스터 처치 시 코인 증가
+                    self.coin_count += 1
                     gem = Gem(monster.rect.centerx, monster.rect.centery)
-                    self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
+                    self.gems.add(gem)
                     self.all_sprites.add(gem)
 
-        # Serin과 보석의 충돌 체크
         for gem in self.gems:
             if self.serin.hitbox.colliderect(gem.rect):
-                self.exp += 10  # 보석 획득 시 경험치 증가
-                gem.kill()  # 보석 제거
+                self.exp += 10
+                gem.kill()
 
     def _draw_clock(self):
-
         elapsed_time = time.time() - self.start_time
         minutes = int(elapsed_time // 60)
         seconds = int(elapsed_time % 60)
@@ -166,18 +159,16 @@ class Main:
         self.screen.blit(text_surface, text_rect)
 
     def _draw_exp_bar(self):
-        bar_length = 1300  # 경험치 바 길이
-        bar_height = 20   # 경험치 바 높이
+        bar_length = 1300
+        bar_height = 20
         fill = (self.exp / self.max_exp) * bar_length
         outline_rect = pygame.Rect(
             (self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
         fill_rect = pygame.Rect(
             (self.screen_width - bar_length) // 2, 10, fill, bar_height)
 
-        pygame.draw.rect(self.screen, (255, 255, 0),
-                         fill_rect)  # 채우기 부분 노란색으로 그리기
-        pygame.draw.rect(self.screen, (255, 255, 255),
-                         outline_rect, 2)  # 경계선 흰색으로 그리기
+        pygame.draw.rect(self.screen, (255, 255, 0), fill_rect)
+        pygame.draw.rect(self.screen, (255, 255, 255), outline_rect, 2)
 
     def _draw_kill_count(self):
         kill_count_text = f"{self.monster_kills}"
@@ -188,7 +179,7 @@ class Main:
             top=45, left=text_rect.right + 10)
 
         self.screen.blit(self.kill_icon, icon_rect)
-        self.screen.blit(text_surface, text_rect)  # 그 다음 텍스트 그리기
+        self.screen.blit(text_surface, text_rect)
 
     def _draw_coin(self):
         coin_count_text = f"{self.coin_count}"
