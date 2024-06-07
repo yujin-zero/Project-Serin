@@ -1,4 +1,5 @@
 from AppleWeapon import AppleWeapon
+from CarrotWeapon import CarrotWeapon
 
 
 class Inventory:
@@ -11,5 +12,11 @@ class Inventory:
     def has_apple_weapon(self):
         for item in self.item_list:
             if isinstance(item, AppleWeapon):
+                return True
+        return False
+
+    def has_carrot_weapon(self):
+        for item in self.item_list:
+            if isinstance(item, CarrotWeapon):
                 return True
         return False

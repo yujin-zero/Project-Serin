@@ -11,6 +11,7 @@ import monster_Spirit  # 영혼 몬스터 모듈
 from ui import Ui
 from Inventory import Inventory
 from AppleWeapon import AppleWeapon  # 사과무기
+from CarrotWeapon import CarrotWeapon  # 당근무기
 from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
 
@@ -43,10 +44,8 @@ class Main:
             self.serin, self.all_sprites, self.monsters)
         self.monster_spawner.add_monster_class(
             monster_squirrel.SquirrelMonster)
-        self.monster_spawner.add_monster_class(
-            monster_BamBoo.BamBooMonster)
-        self.monster_spawner.add_monster_class(
-            monster_Spirit.SpiritMonster)
+        self.monster_spawner.add_monster_class(monster_BamBoo.BamBooMonster)
+        self.monster_spawner.add_monster_class(monster_Spirit.SpiritMonster)
 
         self.all_sprites.add(self.serin)
 
@@ -64,12 +63,22 @@ class Main:
         self.inventory = Inventory()
         self.ui = Ui(self.inventory, self.screen)
 
+        # 사과무기
         self.apple_weapon = AppleWeapon(
             self.serin, 100, 5, "./image/apple.png")
+        # 당근무기
+        self.carrot_weapon = CarrotWeapon(
+            self.serin, 0, 10, "./image/carrot.png", 10)
+
         self.damage_texts = pygame.sprite.Group()
 
         # test
-        self.inventory.add_item(self.apple_weapon)
+        # self.inventory.add_item(self.apple_weapon)
+        self.inventory.add_item(self.carrot_weapon)
+
+        # 당근 무기 자동 발사 간격 설정 (초 단위)
+        self.carrot_fire_interval = 1.0
+        self.last_carrot_fire_time = time.time()
 
     def run(self):
         while self.running:
@@ -86,6 +95,15 @@ class Main:
             if event.type == pygame.QUIT:
                 self.running = False
 
+    def _fire_carrot_weapon(self):  # 일정한 시간으로 당근 발사
+        if self.inventory.has_carrot_weapon():
+            current_time = time.time()
+            if current_time - self.last_carrot_fire_time >= self.carrot_fire_interval:
+                carrot = CarrotWeapon(
+                    self.serin, 0, self.carrot_weapon.speed, "./image/carrot.png", self.carrot_weapon.damage)
+                self.all_sprites.add(carrot)
+                self.last_carrot_fire_time = current_time
+
     def _update(self):
         self.serin.update()
         self.camera.update(self.serin)
@@ -95,6 +113,9 @@ class Main:
         self.gems.update()
         if self.inventory.has_apple_weapon():
             self.apple_weapon.update()
+
+        self._fire_carrot_weapon()
+
         pygame.display.flip()
         self.clock.tick(60)
 
@@ -142,6 +163,19 @@ class Main:
                     self.gems.add(gem)
                     self.all_sprites.add(gem)
 
+            for sprite in self.all_sprites:
+                if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
+                    monster.health -= sprite.damage
+                    self.damage_texts.add(DamageText(
+                        monster.rect.centerx, monster.rect.centery, sprite.damage))
+                    if monster.health <= 0:
+                        monster.kill()
+                        self.monster_kills += 1
+                        self.coin_count += 1
+                        gem = Gem(monster.rect.centerx, monster.rect.centery)
+                        self.gems.add(gem)
+                        self.all_sprites.add(gem)
+
         for gem in self.gems:
             if self.serin.hitbox.colliderect(gem.rect):
                 self.exp += 10
@@ -175,8 +209,7 @@ class Main:
         text_surface = self.font.render(kill_count_text, True, (255, 255, 255))
         text_rect = text_surface.get_rect(
             top=50, right=self.screen_width - 200)
-        icon_rect = self.kill_icon.get_rect(
-            top=45, left=text_rect.right + 10)
+        icon_rect = self.kill_icon.get_rect(top=45, left=text_rect.right + 10)
 
         self.screen.blit(self.kill_icon, icon_rect)
         self.screen.blit(text_surface, text_rect)
@@ -187,7 +220,7 @@ class Main:
         text_rect = text_surface.get_rect(
             top=50, right=self.screen_width - 100)
 
-        icon_rect = self.coin.get_rect(top=29, left=text_rect.right-10)
+        icon_rect = self.coin.get_rect(top=29, left=text_rect.right - 10)
 
         self.screen.blit(self.coin, icon_rect)
         self.screen.blit(text_surface, text_rect)
