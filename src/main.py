@@ -13,6 +13,7 @@ from Inventory import Inventory
 from AppleWeapon import AppleWeapon  # 사과무기
 from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
+from LevelUpUI import LevelUpUI
 
 
 class Main:
@@ -60,6 +61,7 @@ class Main:
         # 경험치 바 초기화
         self.exp = 0
         self.max_exp = 100
+        self.level = 1
         # 몬스터 잡은 카운트
         self.monster_kills = 0
         self.kill_icon = pygame.image.load(
@@ -76,6 +78,12 @@ class Main:
         self.all_sprites.add(self.apple_weapon)
 
         self.damage_texts = pygame.sprite.Group()
+        
+        # 레벨업 UI초기화
+        self.level_up_ui  = LevelUpUI(self.screen,"./image/LevelUpUI.png",self)
+        
+        # 게임 중단 초기화
+        self.paused = False
 
     def run(self):
         while self.running:
@@ -91,37 +99,53 @@ class Main:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif self.level_up_ui.active:
+                self.level_up_ui.handle_event(event)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            # ESC로 UI 비활성화 및 게임 재개
+                self.level_up_ui.active = False
+                self.paused = False
 
     def _update(self):
-        self.serin.update()
-        self.camera.update(self.serin)
-        self.monster_spawner.spawn_monster()
-        self.all_sprites.update()
-        self.damage_texts.update()
-        self.gems.update()
-        pygame.display.flip()
-        self.clock.tick(60)
+        if not self.paused:
+            self.serin.update()
+            self.camera.update(self.serin)
+            self.monster_spawner.spawn_monster()
+            self.all_sprites.update()
+            self.damage_texts.update()
+            self.gems.update()
+            pygame.display.flip()
+            self.clock.tick(60)
 
-        # 여기 경험치 증가 조건 넣기
-        # self.exp += 0.1
-        if self.exp >= self.max_exp:
-            self.exp = 0
+       
+        if self.exp >= self.max_exp:  # 경험치가 최대치에 도달하면
+            self.level += 1
+            self.exp = 0  # 경험치 초기화
+            if self.level % 1 == 0:
+                self.level_up_ui.activate() 
+                self.paused = True
 
     def _draw(self):
         self.background.draw(self.screen, self.camera.x, self.camera.y)
-        for sprite in self.all_sprites:
-            sprite.draw(self.screen, self.camera.x, self.camera.y)
-        for gem in self.gems:
-            gem.draw(self.screen, self.camera.x, self.camera.y)
-        for damage_text in self.damage_texts:
-            self.screen.blit(damage_text.image, (damage_text.rect.x -
-                             self.camera.x, damage_text.rect.y - self.camera.y))
+        if not self.paused:
+            for sprite in self.all_sprites:
+                sprite.draw(self.screen, self.camera.x, self.camera.y)
+            for gem in self.gems:
+                gem.draw(self.screen, self.camera.x, self.camera.y)
+            for damage_text in self.damage_texts:
+                self.screen.blit(damage_text.image, (damage_text.rect.x -
+                                self.camera.x, damage_text.rect.y - self.camera.y))
+                
 
         self._draw_clock()
         self._draw_exp_bar()
         self._draw_kill_count()
         self._draw_coin()
         self.ui.draw()
+        self.level_up_ui.draw()
+        
+        if self.level_up_ui.active:
+            self.level_up_ui.draw()
 
         pygame.display.flip()
 
@@ -167,7 +191,7 @@ class Main:
 
     def _draw_exp_bar(self):
         bar_length = 1300  # 경험치 바 길이
-        bar_height = 20   # 경험치 바 높이
+        bar_height = 35   # 경험치 바 높이
         fill = (self.exp / self.max_exp) * bar_length
         outline_rect = pygame.Rect(
             (self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
@@ -178,6 +202,9 @@ class Main:
                          fill_rect)  # 채우기 부분 노란색으로 그리기
         pygame.draw.rect(self.screen, (255, 255, 255),
                          outline_rect, 2)  # 경계선 흰색으로 그리기
+        level_text = self.font.render(f"Level: {self.level}", True, (255, 255, 255))
+        text_rect = level_text.get_rect(midright=(self.screen_width - 10, 30))
+        self.screen.blit(level_text, text_rect)  #레벨 표시
 
     def _draw_kill_count(self):
         kill_count_text = f"{self.monster_kills}"
