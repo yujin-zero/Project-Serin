@@ -19,7 +19,7 @@ class MonsterSpawner:
     def spawn_monster(self):
         current_time = pygame.time.get_ticks()
         elapsed_time = (current_time - self.start_time) // 1000
-        spawn_count = max(1, elapsed_time // 10 + 1)  # 10초마다 생성 개수 증가
+        spawn_count = max(1, elapsed_time // 20 + 1)  # 20초마다 생성 개수 증가
 
         if current_time - self.last_spawn_time > self.spawn_delay:
             self.last_spawn_time = current_time
@@ -27,7 +27,7 @@ class MonsterSpawner:
                 if self.monster_classes:
                     monster_class = random.choice(self.monster_classes)
                     angle = random.uniform(0, 2 * math.pi)
-                    distance = 400
+                    distance = 600
                     x = self.player.rect.x + distance * math.cos(angle)
                     y = self.player.rect.y + distance * math.sin(angle)
                     monster = monster_class(x, y, self.player)
