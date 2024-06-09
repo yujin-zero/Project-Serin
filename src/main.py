@@ -51,6 +51,7 @@ class Main:
 
         # Serin을 전체 스프라이트 그룹에 추가
         self.all_sprites.add(self.serin)
+        self.weapon_sprites =pygame.sprite.Group()
 
         # 타이머 초기화
         self.clock = pygame.time.Clock()
@@ -67,7 +68,7 @@ class Main:
         # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
-        self.inventory = Inventory()
+        self.inventory = Inventory(self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
 
         # 사과 무기 초기화
@@ -99,8 +100,12 @@ class Main:
         self.all_sprites.update()
         self.damage_texts.update()
         self.gems.update()
+        self.inventory.attck()
+        self.weapon_sprites.update()
         pygame.display.flip()
         self.clock.tick(60)
+        self.inventory.update_item()
+        self.inventory.heal()
 
         # 여기 경험치 증가 조건 넣기
         # self.exp += 0.1
@@ -116,6 +121,9 @@ class Main:
         for damage_text in self.damage_texts:
             self.screen.blit(damage_text.image, (damage_text.rect.x -
                              self.camera.x, damage_text.rect.y - self.camera.y))
+        for sprite in self.weapon_sprites:
+            sprite.draw(self.screen, self.camera.x, self.camera.y)
+
 
         self._draw_clock()
         self._draw_exp_bar()
@@ -146,6 +154,25 @@ class Main:
                     gem = Gem(monster.rect.centerx, monster.rect.centery)
                     self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
                     self.all_sprites.add(gem)
+            
+            for weapon in self.weapon_sprites:
+                if weapon.rect.colliderect(monster.hitbox):
+                    print(weapon.damage)
+                    damage = weapon.damage
+                    monster.health -= damage
+                    self.damage_texts.add(DamageText(
+                    monster.rect.centerx, monster.rect.centery, damage))
+                    if monster.health <= 0:
+                        monster.kill()
+                        self.monster_kills += 1
+                        # self.exp += 10  # 몬스터 처치 시 경험치 증가
+                        self.coin_count += 1  # 몬스터 처치 시 코인 증가
+                        gem = Gem(monster.rect.centerx, monster.rect.centery)
+                        self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
+                        self.all_sprites.add(gem)
+
+
+            
 
         # Serin과 보석의 충돌 체크
         for gem in self.gems:
