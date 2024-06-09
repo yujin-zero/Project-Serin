@@ -98,6 +98,7 @@ class Main:
 
         # test
         self.inventory.add_item(self.apple_weapon)
+        self.apple_weapon.set_level(3)
         # self.inventory.add_item(self.carrot_weapon)
         # self.inventory.add_item(self.health_boost_item)
         # self.inventory.add_item(self.dagame_recudtion_item)
