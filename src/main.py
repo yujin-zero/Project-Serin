@@ -14,13 +14,14 @@ from AppleWeapon import AppleWeapon  # 사과무기
 from CarrotWeapon import CarrotWeapon  # 당근무기
 from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
+from LevelUpUI import LevelUpUI
 
 
 class Main:
     def __init__(self):
         pygame.init()
-        self.screen_width = 1300
-        self.screen_height = 800
+        self.screen_width = 980
+        self.screen_height = 720
         self.screen = pygame.display.set_mode(
             (self.screen_width, self.screen_height))
         pygame.display.set_caption("밤의 수호자 세린")
@@ -40,12 +41,17 @@ class Main:
         self.monsters = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.gems = pygame.sprite.Group()
+
         self.monster_spawner = spawn.MonsterSpawner(
             self.serin, self.all_sprites, self.monsters)
         self.monster_spawner.add_monster_class(
             monster_squirrel.SquirrelMonster)
-        self.monster_spawner.add_monster_class(monster_BamBoo.BamBooMonster)
-        self.monster_spawner.add_monster_class(monster_Spirit.SpiritMonster)
+        # 몬스터 클래스를 관리하는 리스트와 타이머 초기화
+        self.monster_classes = [
+            monster_BamBoo.BamBooMonster, monster_Spirit.SpiritMonster]
+        self.next_monster_time = 60000  # 60초 간격으로 몬스터 클래스 추가
+        self.last_monster_time = pygame.time.get_ticks()
+        self.monster_index = 0
 
         self.all_sprites.add(self.serin)
 
@@ -55,9 +61,13 @@ class Main:
 
         self.exp = 0
         self.max_exp = 100
+
+        self.level = 1
+        # 몬스터 잡은 카운트
         self.monster_kills = 0
         self.kill_icon = pygame.image.load(
             "./image/monster_kill_icon.png").convert_alpha()
+        # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
         self.inventory = Inventory()
@@ -71,6 +81,13 @@ class Main:
             self.serin, 0, 10, "./image/carrot.png", 10)
 
         self.damage_texts = pygame.sprite.Group()
+
+        # 레벨업 UI초기화
+        self.level_up_ui = LevelUpUI(
+            self.screen, "./image/LevelUpUI.png", self)
+
+        # 게임 중단 초기화
+        self.paused = False
 
         # test
         # self.inventory.add_item(self.apple_weapon)
@@ -86,7 +103,6 @@ class Main:
             self._update()
             self._draw()
             self._check_collisions()
-            self.clock.tick(60)
         pygame.quit()
         sys.exit()
 
@@ -94,6 +110,12 @@ class Main:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif self.level_up_ui.active:
+                self.level_up_ui.handle_event(event)
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                # ESC로 UI 비활성화 및 게임 재개
+                self.level_up_ui.active = False
+                self.paused = False
 
     def _fire_carrot_weapon(self):  # 일정한 시간으로 당근 발사
         if self.inventory.has_carrot_weapon():
@@ -105,47 +127,79 @@ class Main:
                 self.last_carrot_fire_time = current_time
 
     def _update(self):
-        self.serin.update()
-        self.camera.update(self.serin)
-        self.monster_spawner.spawn_monster()
-        self.all_sprites.update()
-        self.damage_texts.update()
-        self.gems.update()
-        if self.inventory.has_apple_weapon():
-            self.apple_weapon.update()
+        if not self.paused:
+            self.serin.update()
+            self.camera.update(self.serin)
+            self.monster_spawner.spawn_monster()
+            self.all_sprites.update()
+            self.damage_texts.update()
+            self.gems.update()
 
-        self._fire_carrot_weapon()
+            if self.inventory.has_apple_weapon():
+                self.apple_weapon.update()
 
-        pygame.display.flip()
-        self.clock.tick(60)
+            self._fire_carrot_weapon()
 
-        if self.exp >= self.max_exp:
-            self.exp = 0
+            pygame.display.flip()
+            self.clock.tick(60)
+
+            # if self.exp >= self.max_exp:
+            #     self.exp = 0
+
+        # 일정 시간마다 몬스터 클래스 추가
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_monster_time > self.next_monster_time:
+            if self.monster_index < len(self.monster_classes):
+                self.monster_spawner.add_monster_class(
+                    self.monster_classes[self.monster_index])
+                self.monster_index += 1
+                self.last_monster_time = current_time
+        # 일정 시간마다 몬스터 스텟 업데이트
+        if current_time % 10000 == 0 and self.monster_index > 1:
+            for monster in self.monsters:
+                monster.speed += 0.3
+                monster.power += 0.2
+                monster.health += 100
+
+        if self.exp >= self.max_exp:  # 경험치가 최대치에 도달하면
+            self.level += 1
+            self.exp = 0  # 경험치 초기화
+            if self.level % 1 == 0:
+                self.level_up_ui.activate()
+                self.paused = True
 
     def _draw(self):
         self.background.draw(self.screen, self.camera.x, self.camera.y)
-        for sprite in self.all_sprites:
-            sprite.draw(self.screen, self.camera.x, self.camera.y)
-        for gem in self.gems:
-            gem.draw(self.screen, self.camera.x, self.camera.y)
-        for damage_text in self.damage_texts:
-            self.screen.blit(damage_text.image, (damage_text.rect.x -
-                             self.camera.x, damage_text.rect.y - self.camera.y))
-        if self.inventory.has_apple_weapon():
-            self.apple_weapon.draw(self.screen, self.camera.x, self.camera.y)
+        if not self.paused:
+            for sprite in self.all_sprites:
+                sprite.draw(self.screen, self.camera.x, self.camera.y)
+            for gem in self.gems:
+                gem.draw(self.screen, self.camera.x, self.camera.y)
+            for damage_text in self.damage_texts:
+                self.screen.blit(damage_text.image, (damage_text.rect.x -
+                                                     self.camera.x, damage_text.rect.y - self.camera.y))
+            if self.inventory.has_apple_weapon():
+                self.apple_weapon.draw(
+                    self.screen, self.camera.x, self.camera.y)
 
         self._draw_clock()
         self._draw_exp_bar()
         self._draw_kill_count()
         self._draw_coin()
         self.ui.draw()
+        self.level_up_ui.draw()
+
+        if self.level_up_ui.active:
+            self.level_up_ui.draw()
 
         pygame.display.flip()
 
     def _check_collisions(self):
         for monster in self.monsters:
             if self.serin.hitbox.colliderect(monster.hitbox):
-                self.serin.health -= 0.1  # monster.power
+
+                self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
+
                 if self.serin.health <= 0:
                     self.serin.kill()
                     self.running = False
@@ -158,7 +212,9 @@ class Main:
                 if monster.health <= 0:
                     monster.kill()
                     self.monster_kills += 1
-                    self.coin_count += 1
+
+                    self.coin_count += 1  # 몬스터 처치 시 코인 증가
+
                     gem = Gem(monster.rect.centerx, monster.rect.centery)
                     self.gems.add(gem)
                     self.all_sprites.add(gem)
@@ -193,22 +249,32 @@ class Main:
         self.screen.blit(text_surface, text_rect)
 
     def _draw_exp_bar(self):
-        bar_length = 1300
-        bar_height = 20
+
+        bar_length = 1300  # 경험치 바 길이
+        bar_height = 35   # 경험치 바 높이
+
         fill = (self.exp / self.max_exp) * bar_length
         outline_rect = pygame.Rect(
             (self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
         fill_rect = pygame.Rect(
             (self.screen_width - bar_length) // 2, 10, fill, bar_height)
 
-        pygame.draw.rect(self.screen, (255, 255, 0), fill_rect)
-        pygame.draw.rect(self.screen, (255, 255, 255), outline_rect, 2)
+        pygame.draw.rect(self.screen, (255, 255, 0),
+                         fill_rect)  # 채우기 부분 노란색으로 그리기
+        pygame.draw.rect(self.screen, (255, 255, 255),
+                         outline_rect, 2)  # 경계선 흰색으로 그리기
+        level_text = self.font.render(
+            f"Level: {self.level}", True, (255, 255, 255))
+        text_rect = level_text.get_rect(midright=(self.screen_width - 10, 30))
+        self.screen.blit(level_text, text_rect)  # 레벨 표시
 
     def _draw_kill_count(self):
         kill_count_text = f"{self.monster_kills}"
         text_surface = self.font.render(kill_count_text, True, (255, 255, 255))
+
         text_rect = text_surface.get_rect(
             top=50, right=self.screen_width - 200)
+
         icon_rect = self.kill_icon.get_rect(top=45, left=text_rect.right + 10)
 
         self.screen.blit(self.kill_icon, icon_rect)
