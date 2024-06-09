@@ -1,6 +1,7 @@
 from AppleWeapon import AppleWeapon
 from CarrotWeapon import CarrotWeapon
 from HealthBoostItem import HealthBoostItem
+from DamageReductionItem import DamageReductionItem
 
 
 class Inventory:
@@ -34,3 +35,15 @@ class Inventory:
                 item.apply(character)
                 # self.item_list.remove(item)
                 break
+
+    def has_damage_reduction_item(self):
+        for item in self.item_list:
+            if isinstance(item, DamageReductionItem):
+                return True
+        return False
+
+    # def use_damage_reduction_item(self, character):
+    #     for item in self.item_list:
+    #         if isinstance(item, DamageReductionItem):
+    #             item.apply(character)
+    #             break

@@ -16,6 +16,7 @@ from HealthBoostItem import HealthBoostItem  # 최대 체력 증가
 from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
 from LevelUpUI import LevelUpUI
+from DamageReductionItem import DamageReductionItem
 
 
 class Main:
@@ -83,6 +84,8 @@ class Main:
             self.serin, 0, 10, "./image/carrot.png", 10)
         # 최대 체력 증가 아이템 초기화
         self.health_boost_item = HealthBoostItem(50)
+        # 데미지 감소 아이템 초기화
+        self.dagame_recudtion_item = DamageReductionItem(5)
 
         self.damage_texts = pygame.sprite.Group()
 
@@ -97,6 +100,7 @@ class Main:
         # self.inventory.add_item(self.apple_weapon)
         self.inventory.add_item(self.carrot_weapon)
         # self.inventory.add_item(self.health_boost_item)
+        # self.inventory.add_item(self.dagame_recudtion_item)
 
         # 당근 무기 자동 발사 간격 설정 (초 단위)
         self.carrot_fire_interval = 1.0
@@ -144,7 +148,7 @@ class Main:
             if self.inventory.has_apple_weapon():
                 self.apple_weapon.update()
 
-            if self.inventory.has_apple_weapon():
+            if self.inventory.has_carrot_weapon():
                 self._fire_carrot_weapon()
 
             # 최대 체력 증가 아이템 사용 (테스트용)
@@ -207,6 +211,10 @@ class Main:
             if self.serin.hitbox.colliderect(monster.hitbox):
 
                 self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
+                if self.inventory.has_damage_reduction_item():
+                    self.serin.health += self.dagame_recudtion_item.damage_reduction
+                    if self.serin.health > self.serin.max_health:
+                        self.serin.health = self.serin.max_health
 
                 if self.serin.health <= 0:
                     self.serin.kill()
