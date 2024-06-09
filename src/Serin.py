@@ -11,6 +11,7 @@ class Serin(pygame.sprite.Sprite):
         self.image = self.frames[0]
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)  # 초기 위치를 중심으로 설정
+        self.base_speed = 2
         self.speed = 2
         self.frame_index = 0
         self.frame_count = 6
