@@ -221,20 +221,21 @@ class Main:
                     self.serin.kill()
                     self.running = False
 
-            if self.inventory.has_apple_weapon() and self.apple_weapon.rect.colliderect(monster.hitbox):
-                damage = 10
-                monster.health -= damage
-                self.damage_texts.add(DamageText(
-                    monster.rect.centerx, monster.rect.centery, damage))
-                if monster.health <= 0:
-                    monster.kill()
-                    self.monster_kills += 1
-
-                    self.coin_count += 1  # 몬스터 처치 시 코인 증가
-
-                    gem = Gem(monster.rect.centerx, monster.rect.centery)
-                    self.gems.add(gem)
-                    self.all_sprites.add(gem)
+            if self.inventory.has_apple_weapon():
+                for apple in self.apple_weapon.apples:
+                    if apple['rect'].colliderect(monster.hitbox):
+                        damage = 10
+                        monster.health -= damage
+                        self.damage_texts.add(DamageText(
+                            monster.rect.centerx, monster.rect.centery, damage))
+                        if monster.health <= 0:
+                            monster.kill()
+                            self.monster_kills += 1
+                            self.coin_count += 1  # 몬스터 처치 시 코인 증가
+                            gem = Gem(monster.rect.centerx,
+                                      monster.rect.centery)
+                            self.gems.add(gem)
+                            self.all_sprites.add(gem)
 
             for sprite in self.all_sprites:
                 if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
