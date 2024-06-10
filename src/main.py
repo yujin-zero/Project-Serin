@@ -56,6 +56,7 @@ class Main:
         self.monster_index = 0
 
         self.all_sprites.add(self.serin)
+        self.weapon_sprites =pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
@@ -72,8 +73,7 @@ class Main:
         # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
-
-        self.inventory = Inventory()
+        self.inventory = Inventory(self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
 
         # 사과무기 초기화
@@ -145,16 +145,11 @@ class Main:
             self.all_sprites.update()
             self.damage_texts.update()
             self.gems.update()
-
-            if self.inventory.has_apple_weapon():
-                self.apple_weapon.update()
-
-            if self.inventory.has_carrot_weapon():
-                self._fire_carrot_weapon()
-
-            # 최대 체력 증가 아이템 사용 (테스트용)
-            # if self.inventory.has_health_boost_item():
-            #     self.inventory.use_health_boost_item(self.serin)
+            self.inventory.attck()
+            self.weapon_sprites.update()
+            pygame.display.flip()
+            self.clock.tick(60)
+            self.inventory.update_item()
 
             pygame.display.flip()
             self.clock.tick(60)
@@ -190,10 +185,9 @@ class Main:
                 gem.draw(self.screen, self.camera.x, self.camera.y)
             for damage_text in self.damage_texts:
                 self.screen.blit(damage_text.image, (damage_text.rect.x -
-                                                     self.camera.x, damage_text.rect.y - self.camera.y))
-            if self.inventory.has_apple_weapon():
-                self.apple_weapon.draw(
-                    self.screen, self.camera.x, self.camera.y)
+                                 self.camera.x, damage_text.rect.y - self.camera.y))
+            for sprite in self.weapon_sprites:
+                sprite.draw(self.screen, self.camera.x, self.camera.y)
 
         self._draw_clock()
         self._draw_exp_bar()
@@ -237,18 +231,24 @@ class Main:
                             self.gems.add(gem)
                             self.all_sprites.add(gem)
 
-            for sprite in self.all_sprites:
-                if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
-                    monster.health -= sprite.damage
+            for weapon in self.weapon_sprites:
+                if weapon.rect.colliderect(monster.hitbox):
+                    print(weapon.damage)
+                    damage = weapon.damage
+                    monster.health -= damage
                     self.damage_texts.add(DamageText(
-                        monster.rect.centerx, monster.rect.centery, sprite.damage))
+                    monster.rect.centerx, monster.rect.centery, damage))
                     if monster.health <= 0:
                         monster.kill()
                         self.monster_kills += 1
-                        self.coin_count += 1
+                        # self.exp += 10  # 몬스터 처치 시 경험치 증가
+                        self.coin_count += 1  # 몬스터 처치 시 코인 증가
                         gem = Gem(monster.rect.centerx, monster.rect.centery)
-                        self.gems.add(gem)
+                        self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
                         self.all_sprites.add(gem)
+
+
+            
 
         for gem in self.gems:
             if self.serin.hitbox.colliderect(gem.rect):
