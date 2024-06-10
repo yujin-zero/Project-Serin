@@ -3,20 +3,18 @@ import math
 
 
 class AppleWeapon(pygame.sprite.Sprite):
-    def __init__(self, serin, radius, speed, image_path):
+    def __init__(self, serin):
         super().__init__()
         self.serin = serin
-        self.radius = radius
-        self.speed = speed
-        self.image = pygame.image.load(image_path).convert_alpha()
+        self.radius = 100
+        self.speed = 5
+        self.image = pygame.image.load("./image/apple.png").convert_alpha()
         self.rect = self.image.get_rect(center=self.serin.rect.center)
         self.angle = 0
         self.level = 1
         self.apples = []
-        self._update_apples()
 
-    def _update_apples(self):
-        """사과 개수와 각도를 업데이트합니다."""
+    def update(self):
         self.apples = []
         angle_gap = 360 / self.level
         for i in range(self.level):
@@ -26,12 +24,6 @@ class AppleWeapon(pygame.sprite.Sprite):
                 'rect': self.image.get_rect(center=self.serin.rect.center)
             })
 
-    def set_level(self, level):
-        """레벨을 설정하고 사과를 업데이트합니다."""
-        self.level = level
-        self._update_apples()
-
-    def update(self):
         self.angle += self.speed
         if self.angle >= 360:
             self.angle -= 360
@@ -51,3 +43,6 @@ class AppleWeapon(pygame.sprite.Sprite):
         for apple in self.apples:
             screen.blit(
                 self.image, (apple['rect'].x - camera_x, apple['rect'].y - camera_y))
+    
+    def attack(self):
+        pass
