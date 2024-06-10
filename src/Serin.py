@@ -17,6 +17,7 @@ class Serin(pygame.sprite.Sprite):
         self.frame_count = 6
         self.frame_delay = 100
         self.last_update_time = pygame.time.get_ticks()
+        self.direction=1
 
         self.health = 50
         self.max_health = 50
@@ -35,10 +36,12 @@ class Serin(pygame.sprite.Sprite):
 
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
+            self.direction=-1
             if current_time - self.last_update_time > self.frame_delay:
                 self.frame_index = (self.frame_index + 1) % self.frame_count
                 self.last_update_time = current_time
         elif keys[pygame.K_RIGHT]:
+            self.direction=1
             self.rect.x += self.speed
             if current_time - self.last_update_time > self.frame_delay:
                 self.frame_index = 6 + (self.frame_index + 1) % self.frame_count
