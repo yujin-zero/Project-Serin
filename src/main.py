@@ -12,18 +12,31 @@ from ui import Ui
 from Inventory import Inventory
 from AppleWeapon import AppleWeapon  # 사과무기
 from CarrotWeapon import CarrotWeapon  # 당근무기
+from HealthBoostItem import HealthBoostItem  # 최대 체력 증가
 from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
 from LevelUpUI import LevelUpUI
+from DamageReductionItem import DamageReductionItem
 
 
 class Main:
     def __init__(self):
         pygame.init()
-        self.screen_width = 980
-        self.screen_height = 600
-        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+
+        self.screen_width = 1300
+        self.screen_height = 800
+        self.screen = pygame.display.set_mode(
+            (self.screen_width, self.screen_height))
+
         pygame.display.set_caption("밤의 수호자 세린")
+
+        # 오디오 시스템 초기화
+        pygame.mixer.init()
+
+        # 배경 음악 로드 및 재생
+        pygame.mixer.music.load("bgm.mp3")
+        pygame.mixer.music.set_volume(0.5)  # 볼륨 설정 (0.0 ~ 1.0)
+        pygame.mixer.music.play(-1)
 
         self.background = Background("./image/background.png")
         self.boundary_width = self.background.width
@@ -51,6 +64,7 @@ class Main:
         self.monster_index = 0
 
         self.all_sprites.add(self.serin)
+        self.weapon_sprites = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
@@ -64,22 +78,21 @@ class Main:
         self.kill_icon = pygame.image.load("./image/monster_kill_icon.png").convert_alpha()
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
-        self.inventory = Inventory()
+        self.inventory = Inventory(
+            self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
 
-        self.apple_weapon = AppleWeapon(self.serin, 100, 5, "./image/apple.png")
-        self.carrot_weapon = CarrotWeapon(self.serin, 0, 10, "./image/carrot.png", 10)
+        
+        # 최대 체력 증가 아이템 초기화
+        self.health_boost_item = HealthBoostItem(50)
+        # 데미지 감소 아이템 초기화
+        self.dagame_recudtion_item = DamageReductionItem(5)
 
         self.damage_texts = pygame.sprite.Group()
 
         self.level_up_ui = LevelUpUI(self.screen, "./image/LevelUpUI.png", self)
 
         self.paused = False
-
-        self.inventory.add_item(self.carrot_weapon)
-
-        self.carrot_fire_interval = 1.0
-        self.last_carrot_fire_time = time.time()
 
         self.game_over = False  # 게임 오버 상태 추가
         self.final_score = 0  # 최종 점수 추가
@@ -143,6 +156,7 @@ class Main:
                 self._update()
             self._draw()
             self._check_collisions()
+            self.clock.tick(60)
         pygame.quit()
         sys.exit()
 
@@ -158,14 +172,11 @@ class Main:
                     self.paused = False
                 if self.game_over and event.key == pygame.K_r:
                     self._initialize_game()  # 게임 재시작
+#                 if event.key == pygame.K_ESCAPE:
+#                     # ESC로 UI 비활성화 및 게임 재개
+#                     self.level_up_ui.active = False
+#                     self.paused = False 
 
-    def _fire_carrot_weapon(self):  # 일정한 시간으로 당근 발사
-        if self.inventory.has_carrot_weapon():
-            current_time = time.time()
-            if current_time - self.last_carrot_fire_time >= self.carrot_fire_interval:
-                carrot = CarrotWeapon(self.serin, 0, self.carrot_weapon.speed, "./image/carrot.png", self.carrot_weapon.damage)
-                self.all_sprites.add(carrot)
-                self.last_carrot_fire_time = current_time
 
     def _update(self):
         if not self.paused:
@@ -175,14 +186,11 @@ class Main:
             self.all_sprites.update()
             self.damage_texts.update()
             self.gems.update()
-
-            if self.inventory.has_apple_weapon():
-                self.apple_weapon.update()
-
-            self._fire_carrot_weapon()
-
+            self.inventory.attck()
+            self.weapon_sprites.update()
             pygame.display.flip()
             self.clock.tick(60)
+            self.inventory.update_item()
 
         current_time = pygame.time.get_ticks()
         if current_time - self.last_monster_time > self.next_monster_time:
@@ -204,6 +212,7 @@ class Main:
                 self.paused = True
 
     def _draw(self):
+
         if self.game_over:
             self.show_game_over_screen()  # 게임 오버 화면 표시
         else:
@@ -215,8 +224,8 @@ class Main:
                     gem.draw(self.screen, self.camera.x, self.camera.y)
                 for damage_text in self.damage_texts:
                     self.screen.blit(damage_text.image, (damage_text.rect.x - self.camera.x, damage_text.rect.y - self.camera.y))
-                if self.inventory.has_apple_weapon():
-                    self.apple_weapon.draw(self.screen, self.camera.x, self.camera.y)
+                for sprite in self.weapon_sprites:
+                    sprite.draw(self.screen, self.camera.x, self.camera.y)
 
             self._draw_clock()
             self._draw_exp_bar()
@@ -233,35 +242,51 @@ class Main:
     def _check_collisions(self):
         for monster in self.monsters:
             if self.serin.hitbox.colliderect(monster.hitbox):
-                self.serin.health -= monster.power
+                self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
+                if self.inventory.has_damage_reduction_item():
+                    self.serin.health += self.dagame_recudtion_item.damage_reduction
+                    if self.serin.health > self.serin.max_health:
+                        self.serin.health = self.serin.max_health
 
                 if self.serin.health <= 0:
                     self.serin.kill()
                     self.final_score = time.time() - self.start_time  # 게임 오버 시점의 플레이 타임을 최종 점수로 저장
                     self.game_over = True  # 게임 오버 상태로 설정
 
-            if self.inventory.has_apple_weapon() and self.apple_weapon.rect.colliderect(monster.hitbox):
-                damage = 10
-                monster.health -= damage
-                self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, damage))
-                if monster.health <= 0:
-                    monster.kill()
-                    self.monster_kills += 1
-                    self.coin_count += 1
-                    gem = Gem(monster.rect.centerx, monster.rect.centery)
-                    self.gems.add(gem)
-                    self.all_sprites.add(gem)
 
-            for sprite in self.all_sprites:
-                if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
-                    monster.health -= sprite.damage
-                    self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, sprite.damage))
+#             if self.inventory.has_apple_weapon() and self.apple_weapon.rect.colliderect(monster.hitbox):
+#                 damage = 10
+#                 monster.health -= damage
+#                 self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, damage))
+#                 if monster.health <= 0:
+#                     monster.kill()
+#                     self.monster_kills += 1
+#                     self.coin_count += 1
+#                     gem = Gem(monster.rect.centerx, monster.rect.centery)
+#                     self.gems.add(gem)
+#                     self.all_sprites.add(gem)
+
+#             for sprite in self.all_sprites:
+#                 if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
+#                     monster.health -= sprite.damage
+#                     self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, sprite.damage))
+
+
+            for weapon in self.weapon_sprites:
+                if weapon.rect.colliderect(monster.hitbox):
+                    print(weapon.damage)
+                    damage = weapon.damage
+                    monster.health -= damage
+                    self.damage_texts.add(DamageText(
+                        monster.rect.centerx, monster.rect.centery, damage))
+
                     if monster.health <= 0:
                         monster.kill()
                         self.monster_kills += 1
-                        self.coin_count += 1
+                        # self.exp += 10  # 몬스터 처치 시 경험치 증가
+                        self.coin_count += 1  # 몬스터 처치 시 코인 증가
                         gem = Gem(monster.rect.centerx, monster.rect.centery)
-                        self.gems.add(gem)
+                        self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
                         self.all_sprites.add(gem)
 
         for gem in self.gems:
