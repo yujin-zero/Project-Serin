@@ -28,6 +28,14 @@ class Main:
             (self.screen_width, self.screen_height))
         pygame.display.set_caption("밤의 수호자 세린")
 
+        # 오디오 시스템 초기화
+        pygame.mixer.init()
+
+        # 배경 음악 로드 및 재생
+        pygame.mixer.music.load("bgm.mp3")
+        pygame.mixer.music.set_volume(0.5)  # 볼륨 설정 (0.0 ~ 1.0)
+        pygame.mixer.music.play(-1)
+
         self.background = Background("./image/background.png")
         self.boundary_width = self.background.width
         self.boundary_height = self.background.height
@@ -56,7 +64,7 @@ class Main:
         self.monster_index = 0
 
         self.all_sprites.add(self.serin)
-        self.weapon_sprites =pygame.sprite.Group()
+        self.weapon_sprites = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
@@ -73,7 +81,8 @@ class Main:
         # 코인 개수
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
-        self.inventory = Inventory(self.serin, self.screen, self.weapon_sprites)
+        self.inventory = Inventory(
+            self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
         
         # 최대 체력 증가 아이템 초기화
@@ -196,7 +205,7 @@ class Main:
                     damage = weapon.damage
                     monster.health -= damage
                     self.damage_texts.add(DamageText(
-                    monster.rect.centerx, monster.rect.centery, damage))
+                        monster.rect.centerx, monster.rect.centery, damage))
                     if monster.health <= 0:
                         monster.kill()
                         self.monster_kills += 1
@@ -205,9 +214,6 @@ class Main:
                         gem = Gem(monster.rect.centerx, monster.rect.centery)
                         self.gems.add(gem)  # 몬스터가 죽은 위치에 보석 추가
                         self.all_sprites.add(gem)
-
-
-            
 
         for gem in self.gems:
             if self.serin.hitbox.colliderect(gem.rect):
@@ -250,7 +256,7 @@ class Main:
         text_surface = self.font.render(kill_count_text, True, (255, 255, 255))
 
         text_rect = text_surface.get_rect(
-            top = 50, right=self.screen_width - 200)
+            top=50, right=self.screen_width - 200)
 
         icon_rect = self.kill_icon.get_rect(top=45, left=text_rect.right + 10)
 
