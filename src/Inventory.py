@@ -25,6 +25,7 @@ class Inventory:
         self.add_weapon(self.carrot_weapon)
         self.add_item(self.wing_boots);
         self.add_weapon(self.apple_weapon)
+        self.add_weapon(self.whip_weapon)
         weapon_sprite.add(self.apple_weapon)
 
 
