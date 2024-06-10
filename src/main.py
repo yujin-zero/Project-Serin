@@ -75,13 +75,7 @@ class Main:
         self.coin = pygame.image.load("./image/coin.png")
         self.inventory = Inventory(self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
-
-        # 사과무기 초기화
-        self.apple_weapon = AppleWeapon(
-            self.serin, 100, 5, "./image/apple.png")
-        # 당근무기 초기화
-        self.carrot_weapon = CarrotWeapon(
-            self.serin, 0, 10, "./image/carrot.png", 10)
+        
         # 최대 체력 증가 아이템 초기화
         self.health_boost_item = HealthBoostItem(50)
         # 데미지 감소 아이템 초기화
@@ -95,17 +89,6 @@ class Main:
 
         # 게임 중단 초기화
         self.paused = False
-
-        # test
-        self.inventory.add_item(self.apple_weapon)
-        self.apple_weapon.set_level(3)
-        self.inventory.add_item(self.carrot_weapon)
-        # self.inventory.add_item(self.health_boost_item)
-        # self.inventory.add_item(self.dagame_recudtion_item)
-
-        # 당근 무기 자동 발사 간격 설정 (초 단위)
-        self.carrot_fire_interval = 1.0
-        self.last_carrot_fire_time = time.time()
 
     def run(self):
         while self.running:
@@ -126,16 +109,7 @@ class Main:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 # ESC로 UI 비활성화 및 게임 재개
                 self.level_up_ui.active = False
-                self.paused = False
-
-    def _fire_carrot_weapon(self):  # 일정한 시간으로 당근 발사
-        if self.inventory.has_carrot_weapon():
-            current_time = time.time()
-            if current_time - self.last_carrot_fire_time >= self.carrot_fire_interval:
-                carrot = CarrotWeapon(
-                    self.serin, 0, self.carrot_weapon.speed, "./image/carrot.png", self.carrot_weapon.damage)
-                self.all_sprites.add(carrot)
-                self.last_carrot_fire_time = current_time
+                self.paused = False        
 
     def _update(self):
         if not self.paused:
@@ -215,21 +189,6 @@ class Main:
                     self.serin.kill()
                     self.running = False
 
-            if self.inventory.has_apple_weapon():
-                for apple in self.apple_weapon.apples:
-                    if apple['rect'].colliderect(monster.hitbox):
-                        damage = 10
-                        monster.health -= damage
-                        self.damage_texts.add(DamageText(
-                            monster.rect.centerx, monster.rect.centery, damage))
-                        if monster.health <= 0:
-                            monster.kill()
-                            self.monster_kills += 1
-                            self.coin_count += 1  # 몬스터 처치 시 코인 증가
-                            gem = Gem(monster.rect.centerx,
-                                      monster.rect.centery)
-                            self.gems.add(gem)
-                            self.all_sprites.add(gem)
 
             for weapon in self.weapon_sprites:
                 if weapon.rect.colliderect(monster.hitbox):
