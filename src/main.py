@@ -99,7 +99,7 @@ class Main:
         # test
         self.inventory.add_item(self.apple_weapon)
         self.apple_weapon.set_level(3)
-        # self.inventory.add_item(self.carrot_weapon)
+        self.inventory.add_item(self.carrot_weapon)
         # self.inventory.add_item(self.health_boost_item)
         # self.inventory.add_item(self.dagame_recudtion_item)
 
@@ -291,7 +291,7 @@ class Main:
         text_surface = self.font.render(kill_count_text, True, (255, 255, 255))
 
         text_rect = text_surface.get_rect(
-            top=50, right=self.screen_width - 200)
+            top = 50, right=self.screen_width - 200)
 
         icon_rect = self.kill_icon.get_rect(top=45, left=text_rect.right + 10)
 
