@@ -10,8 +10,6 @@ import monster_BamBoo  # 대나무 몬스터 모듈
 import monster_Spirit  # 영혼 몬스터 모듈
 from ui import Ui
 from Inventory import Inventory
-from AppleWeapon import AppleWeapon  # 사과무기
-from CarrotWeapon import CarrotWeapon  # 당근무기
 from HealthBoostItem import HealthBoostItem  # 최대 체력 증가
 from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
@@ -41,13 +39,14 @@ class Main:
         self.background = Background("./image/background.png")
         self.boundary_width = self.background.width
         self.boundary_height = self.background.height
-        self.korean_font_path="./10 - Enemies/graphics/font/joystix.ttf"
+        self.korean_font_path = "./10 - Enemies/graphics/font/joystix.ttf"
         self._initialize_game()
 
     def _initialize_game(self):
         serin_start_x = self.boundary_width // 2
         serin_start_y = self.boundary_height // 2
-        self.serin = Serin(serin_start_x, serin_start_y, self.boundary_width, self.boundary_height)
+        self.serin = Serin(serin_start_x, serin_start_y,
+                           self.boundary_width, self.boundary_height)
 
         self.camera = Camera(self.screen_width, self.screen_height)
         self.running = True
@@ -56,9 +55,12 @@ class Main:
         self.all_sprites = pygame.sprite.Group()
         self.gems = pygame.sprite.Group()
 
-        self.monster_spawner = spawn.MonsterSpawner(self.serin, self.all_sprites, self.monsters)
-        self.monster_spawner.add_monster_class(monster_squirrel.SquirrelMonster)
-        self.monster_classes = [monster_BamBoo.BamBooMonster, monster_Spirit.SpiritMonster]
+        self.monster_spawner = spawn.MonsterSpawner(
+            self.serin, self.all_sprites, self.monsters)
+        self.monster_spawner.add_monster_class(
+            monster_squirrel.SquirrelMonster)
+        self.monster_classes = [
+            monster_BamBoo.BamBooMonster, monster_Spirit.SpiritMonster]
         self.next_monster_time = 60000
         self.last_monster_time = pygame.time.get_ticks()
         self.monster_index = 0
@@ -75,14 +77,14 @@ class Main:
 
         self.level = 1
         self.monster_kills = 0
-        self.kill_icon = pygame.image.load("./image/monster_kill_icon.png").convert_alpha()
+        self.kill_icon = pygame.image.load(
+            "./image/monster_kill_icon.png").convert_alpha()
         self.coin_count = 0
         self.coin = pygame.image.load("./image/coin.png")
         self.inventory = Inventory(
             self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
 
-        
         # 최대 체력 증가 아이템 초기화
         self.health_boost_item = HealthBoostItem(50)
         # 데미지 감소 아이템 초기화
@@ -90,7 +92,8 @@ class Main:
 
         self.damage_texts = pygame.sprite.Group()
 
-        self.level_up_ui = LevelUpUI(self.screen, "./image/LevelUpUI.png", self)
+        self.level_up_ui = LevelUpUI(
+            self.screen, "./image/LevelUpUI.png", self)
 
         self.paused = False
 
@@ -98,16 +101,18 @@ class Main:
         self.final_score = 0  # 최종 점수 추가
 
         # 시작 및 종료 화면 이미지 로드 및 크기 조정
-        self.start_screen_image = pygame.transform.scale(pygame.image.load("./image/gamestart.webp").convert(), (self.screen_width, self.screen_height))
-        self.game_over_image = pygame.transform.scale(pygame.image.load("./image/gameover.webp").convert(), (self.screen_width, self.screen_height))
+        self.start_screen_image = pygame.transform.scale(pygame.image.load(
+            "./image/gamestart.webp").convert(), (self.screen_width, self.screen_height))
+        self.game_over_image = pygame.transform.scale(pygame.image.load(
+            "./image/gameover.webp").convert(), (self.screen_width, self.screen_height))
 
     def show_start_screen(self):
         self.screen.blit(self.start_screen_image, (0, 0))
-        title_font = pygame.font.Font("DungGeunMo.ttf",52)
+        title_font = pygame.font.Font("DungGeunMo.ttf", 52)
         title_text = title_font.render("세린이 키우기", True, (255, 255, 255))
         title_rect = title_text.get_rect(center=(self.screen_width // 2, 50))
         self.screen.blit(title_text, title_rect)
-      
+
         pygame.display.flip()
 
         waiting = True
@@ -125,16 +130,21 @@ class Main:
         game_over_font = pygame.font.Font(None, 74)
         prompt_font = pygame.font.Font(None, 36)
         score_font = pygame.font.Font(self.korean_font_path, 24)
-        restart_font = pygame.font.Font(self.korean_font_path, 24)  # 재시작 문구 폰트 설정
-    
-        score_surface = score_font.render(f"Score: {self.final_score:.2f} seconds", True, (0, 0, 0))
-        score_rect = score_surface.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 150))
-        restart_text = restart_font.render("PRESS R TO RESTART!", True, (255, 0, 0))
-        restart_rect = restart_text.get_rect(center=(self.screen_width // 2, self.screen_height // 2 + 270))  # 재시작 문구 위치 설정
+        restart_font = pygame.font.Font(
+            self.korean_font_path, 24)  # 재시작 문구 폰트 설정
+
+        score_surface = score_font.render(
+            f"Score: {self.final_score:.2f} seconds", True, (0, 0, 0))
+        score_rect = score_surface.get_rect(
+            center=(self.screen_width // 2, self.screen_height // 2 + 150))
+        restart_text = restart_font.render(
+            "PRESS R TO RESTART!", True, (255, 0, 0))
+        restart_rect = restart_text.get_rect(
+            center=(self.screen_width // 2, self.screen_height // 2 + 270))  # 재시작 문구 위치 설정
 
         self.screen.blit(score_surface, score_rect)
         self.screen.blit(restart_text, restart_rect)
-    
+
         pygame.display.flip()
 
         waiting = True
@@ -172,11 +182,6 @@ class Main:
                     self.paused = False
                 if self.game_over and event.key == pygame.K_r:
                     self._initialize_game()  # 게임 재시작
-#                 if event.key == pygame.K_ESCAPE:
-#                     # ESC로 UI 비활성화 및 게임 재개
-#                     self.level_up_ui.active = False
-#                     self.paused = False 
-
 
     def _update(self):
         if not self.paused:
@@ -195,7 +200,8 @@ class Main:
         current_time = pygame.time.get_ticks()
         if current_time - self.last_monster_time > self.next_monster_time:
             if self.monster_index < len(self.monster_classes):
-                self.monster_spawner.add_monster_class(self.monster_classes[self.monster_index])
+                self.monster_spawner.add_monster_class(
+                    self.monster_classes[self.monster_index])
                 self.monster_index += 1
                 self.last_monster_time = current_time
         if current_time % 10000 == 0 and self.monster_index > 1:
@@ -223,7 +229,8 @@ class Main:
                 for gem in self.gems:
                     gem.draw(self.screen, self.camera.x, self.camera.y)
                 for damage_text in self.damage_texts:
-                    self.screen.blit(damage_text.image, (damage_text.rect.x - self.camera.x, damage_text.rect.y - self.camera.y))
+                    self.screen.blit(damage_text.image, (damage_text.rect.x -
+                                     self.camera.x, damage_text.rect.y - self.camera.y))
                 for sprite in self.weapon_sprites:
                     sprite.draw(self.screen, self.camera.x, self.camera.y)
 
@@ -253,28 +260,9 @@ class Main:
                     self.final_score = time.time() - self.start_time  # 게임 오버 시점의 플레이 타임을 최종 점수로 저장
                     self.game_over = True  # 게임 오버 상태로 설정
 
-
-#             if self.inventory.has_apple_weapon() and self.apple_weapon.rect.colliderect(monster.hitbox):
-#                 damage = 10
-#                 monster.health -= damage
-#                 self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, damage))
-#                 if monster.health <= 0:
-#                     monster.kill()
-#                     self.monster_kills += 1
-#                     self.coin_count += 1
-#                     gem = Gem(monster.rect.centerx, monster.rect.centery)
-#                     self.gems.add(gem)
-#                     self.all_sprites.add(gem)
-
-#             for sprite in self.all_sprites:
-#                 if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
-#                     monster.health -= sprite.damage
-#                     self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, sprite.damage))
-
-
             for weapon in self.weapon_sprites:
                 if weapon.rect.colliderect(monster.hitbox):
-                    print(weapon.damage)
+                    # print(weapon.damage)
                     damage = weapon.damage
                     monster.health -= damage
                     self.damage_texts.add(DamageText(
@@ -310,12 +298,17 @@ class Main:
         bar_height = 35   # 경험치 바 높이
 
         fill = (self.exp / self.max_exp) * bar_length
-        outline_rect = pygame.Rect((self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
-        fill_rect = pygame.Rect((self.screen_width - bar_length) // 2, 10, fill, bar_height)
+        outline_rect = pygame.Rect(
+            (self.screen_width - bar_length) // 2, 10, bar_length, bar_height)
+        fill_rect = pygame.Rect(
+            (self.screen_width - bar_length) // 2, 10, fill, bar_height)
 
-        pygame.draw.rect(self.screen, (255, 255, 0), fill_rect)  # 채우기 부분 노란색으로 그리기
-        pygame.draw.rect(self.screen, (255, 255, 255), outline_rect, 2)  # 경계선 흰색으로 그리기
-        level_text = self.font.render(f"Level: {self.level}", True, (255, 255, 255))
+        pygame.draw.rect(self.screen, (255, 255, 0),
+                         fill_rect)  # 채우기 부분 노란색으로 그리기
+        pygame.draw.rect(self.screen, (255, 255, 255),
+                         outline_rect, 2)  # 경계선 흰색으로 그리기
+        level_text = self.font.render(
+            f"Level: {self.level}", True, (255, 255, 255))
         text_rect = level_text.get_rect(midright=(self.screen_width - 10, 30))
         self.screen.blit(level_text, text_rect)  # 레벨 표시
 
@@ -323,7 +316,8 @@ class Main:
         kill_count_text = f"{self.monster_kills}"
         text_surface = self.font.render(kill_count_text, True, (255, 255, 255))
 
-        text_rect = text_surface.get_rect(top=50, right=self.screen_width - 200)
+        text_rect = text_surface.get_rect(
+            top=50, right=self.screen_width - 200)
 
         icon_rect = self.kill_icon.get_rect(top=45, left=text_rect.right + 10)
 
@@ -333,7 +327,8 @@ class Main:
     def _draw_coin(self):
         coin_count_text = f"{self.coin_count}"
         text_surface = self.font.render(coin_count_text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(top=50, right=self.screen_width - 100)
+        text_rect = text_surface.get_rect(
+            top=50, right=self.screen_width - 100)
 
         icon_rect = self.coin.get_rect(top=29, left=text_rect.right - 10)
 
