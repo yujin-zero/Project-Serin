@@ -3,14 +3,14 @@ import math
 
 
 class Apple(pygame.sprite.Sprite):
-    def __init__(self, serin, radius, speed, damage):
+    def __init__(self, serin, radius, speed, damage, angle_offset):
         super().__init__()
         self.serin = serin
         self.radius = radius
         self.speed = speed
         self.image = pygame.image.load("./image/apple.png").convert_alpha()
         self.rect = self.image.get_rect(center=self.serin.rect.center)
-        self.angle = 0
+        self.angle = angle_offset
         self.damage = damage
 
     def update(self):
@@ -41,20 +41,39 @@ class AppleWeapon:
         self.maxLevel = 5
         self.radius = 80
         self.speed = 4
-        self.apple = Apple(serin, self.radius, self.speed,
-                           self.damage[self.level])
-        self.all_sprite.add(self.apple)
+        self.apples = []
+        self.image = pygame.image.load("./image/apple.png").convert_alpha()
+        self.add_apples()
+
+    def add_apples(self):
+        for apple in self.apples:
+            apple.kill()  # 기존 사과 제거
+        self.apples = []
+
+        total_apples = self.level  # 레벨에 따른 사과 개수
+        angle_step = 360 / total_apples
+
+        for i in range(total_apples):
+            angle_offset = i * angle_step
+            apple = Apple(self.serin, self.radius, self.speed,
+                          self.damage[self.level], angle_offset)
+            self.apples.append(apple)
+            self.all_sprite.add(apple)
 
     def attack(self):
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay[self.level]:
             self.last_shot = now
-            if self.level < self.maxLevel:
-                self.level += 1
-                self.apple.damage = self.damage[self.level]
+            # if self.level < self.maxLevel:
+            #     self.level += 1
+            #     self.add_apples()  # 사과 추가 및 위치 재설정
+            #     for apple in self.apples:
+            #         apple.damage = self.damage[self.level]
 
     def update(self):
-        self.apple.update()
+        for apple in self.apples:
+            apple.update()
 
     def draw(self):
-        self.apple.draw(self.screen, 0, 0)
+        for apple in self.apples:
+            apple.draw(self.screen, 0, 0)

@@ -20,11 +20,11 @@ class Inventory:
         self.heart = Heart()
         self.carrot_weapon = CarrotWeapon(Serin, Screen, weapon_sprite)
         self.whip_weapon = WhipWeapon(Serin, Screen, weapon_sprite)
-        
+
         # self.add_weapon(self.leaf_weapon)
-        # self.add_weapon(self.carrot_weapon)
+        self.add_weapon(self.carrot_weapon)
         # self.add_item(self.wing_boots)
-        self.add_weapon(self.apple_weapon)
+        self.add_weapon(self.apple_weapon)  # 사과 왜 돌아가지..
         # self.add_weapon(self.whip_weapon)
 
     def add_weapon(self, item):
@@ -43,6 +43,23 @@ class Inventory:
 
     def heal(self):
         self.heart.update(self.serin)
+
+    def increase_apple_weapon_level(self):
+        if self.apple_weapon.level < self.apple_weapon.maxLevel:
+            self.apple_weapon.level += 1
+            self.apple_weapon.add_apples()  # 사과 추가 및 위치 재설정
+            for apple in self.apple_weapon.apples:
+                apple.damage = self.apple_weapon.damage[self.apple_weapon.level]
+
+    def has_carrot_weapon(self):
+        return any(isinstance(weapon, CarrotWeapon) for weapon in self.weapon_list)
+
+    def has_leaf_weapon(self):
+        return any(isinstance(weapon, LeafWeapon) for weapon in self.weapon_list)
+
+    # def increase_carrot_weapon_level(self):
+    #     if self.carrot_weapon.level < self.carrot_weapon.maxLevel:
+    #         self.carrot_weapon.level += 1
 
     def has_health_boost_item(self):
         for item in self.item_list:
