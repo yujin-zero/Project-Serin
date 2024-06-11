@@ -80,6 +80,6 @@ python main.py
 
 ## 저자
 - **개발자**: [소유진], [하윤철], [김시원], [윤의종]
-- **이메일**: [https://github.com/poly30] , [https://github.com/YoonCheol], [https://github.com/huro0906],[https://github.com/Dochanii]
+- **이메일**: [https://github.com/poly30] , [https://github.com/Yooncheol1], [https://github.com/huro0906],[https://github.com/Dochanii]
 
 게임을 즐기세요!
