@@ -23,9 +23,9 @@ class LevelUpUI:
                             }
         # 상태 이미지와 설명 설명 추가 하는 곳
         self.status_images = {
-            "./image/grass.png": "  추가 방어력 획득",
-            "./image/carrot.png": "  생명력 증가",
-            "./image/status.png": "  마법 능력 강화"
+            "./image/armor.png": "  피해량 감소",
+            "./image/health.png": "  최대 체력 증가",
+            "./image/status.png": "  이동 속도 증가"
         }
 
         self.initialize_buttons()
@@ -34,14 +34,15 @@ class LevelUpUI:
         # 랜덤 선택을 위해 이미지 경로와 텍스트를 직접 추출
         item_image_path, item_text = random.choice(list(self.item_images.items()))
         self.item_button = Button(
-            self.item_button_x, self.item_button_y, self.button_width, self.button_height,
-            self.resume_game, "./image/SelectItemSlot.png", [item_image_path], item_text
-        )
+        self.item_button_x, self.item_button_y, self.button_width, self.button_height,
+        lambda path=item_image_path: self.resume_game(path), "./image/SelectItemSlot.png", [item_image_path], item_text
+    )
         
         status_image_path, status_text = random.choice(list(self.status_images.items()))
         self.status_button = Button(
             self.item_button_x, self.item_button_y + self.button_height + 20, self.button_width, self.button_height,
-            self.resume_game, "./image/SelectItemSlot.png", [status_image_path], status_text
+            lambda path=status_image_path: self.resume_game(path), "./image/SelectItemSlot.png", [status_image_path], status_text
+            
         )
         self.buttons = [self.item_button, self.status_button]
 
@@ -56,7 +57,21 @@ class LevelUpUI:
         for button in self.buttons:
             button.handle_event(event)
 
-    def resume_game(self):
+    def resume_game(self, item_image_path):
+        
+        if item_image_path == "./image/appleItem.png":
+            print("사과 버튼이 눌렸습니다.")
+        elif item_image_path == "./image/carrot.png":
+            print("당근 버튼이 눌렸습니다.")
+        elif item_image_path == "./image/grass.png":
+            print("풀 버튼이 눌렸습니다.")
+        elif item_image_path == "./image/armor.png":
+            print("갑옷 버튼이 눌렸습니다.")
+        elif item_image_path == "./image/health.png":
+            print("체력 버튼이 눌렸습니다.")
+        elif item_image_path == "./image/status.png":
+            print("어쩌구")
+
         self.active = False
         self.game_instance.paused = False
 

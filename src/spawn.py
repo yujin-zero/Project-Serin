@@ -27,7 +27,7 @@ class MonsterSpawner:
                 if self.monster_classes:
                     monster_class = random.choice(self.monster_classes)
                     angle = random.uniform(0, 2 * math.pi)
-                    distance = 600
+                    distance = 700
                     x = self.player.rect.x + distance * math.cos(angle)
                     y = self.player.rect.y + distance * math.sin(angle)
                     monster = monster_class(x, y, self.player)
