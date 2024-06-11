@@ -22,7 +22,7 @@ class Inventory:
         self.whip_weapon = WhipWeapon(Serin, Screen, weapon_sprite)
 
         # self.add_weapon(self.leaf_weapon)
-        self.add_weapon(self.carrot_weapon)
+        # self.add_weapon(self.carrot_weapon)
         # self.add_item(self.wing_boots)
         self.add_weapon(self.apple_weapon)  # 사과 왜 돌아가지..
         # self.add_weapon(self.whip_weapon)
@@ -56,6 +56,9 @@ class Inventory:
 
     def has_leaf_weapon(self):
         return any(isinstance(weapon, LeafWeapon) for weapon in self.weapon_list)
+
+    def has_whip_weapon(self):
+        return any(isinstance(weapon, WhipWeapon) for weapon in self.weapon_list)
 
     # def increase_carrot_weapon_level(self):
     #     if self.carrot_weapon.level < self.carrot_weapon.maxLevel:
