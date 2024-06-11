@@ -20,7 +20,7 @@ class Inventory:
         self.heart = Heart()
         self.carrot_weapon = CarrotWeapon(Serin, Screen, weapon_sprite)
         self.whip_weapon = WhipWeapon(Serin, Screen, weapon_sprite)
-
+        
         # self.add_weapon(self.leaf_weapon)
         # self.add_weapon(self.carrot_weapon)
         # self.add_item(self.wing_boots)

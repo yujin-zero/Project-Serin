@@ -70,7 +70,6 @@ class Main:
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
-        self.start_time = time.time()
 
         self.exp = 0
         self.max_exp = 100
@@ -123,6 +122,8 @@ class Main:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
+                        self.start_time = time.time()  # 게임 시작 시간 설정
+                        self._initialize_game()
                         waiting = False
 
     def show_game_over_screen(self):
@@ -155,6 +156,7 @@ class Main:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
+                        self.start_time = time.time()  # 게임 시작 시간 설정
                         self._initialize_game()  # 게임 재시작
                         waiting = False
 
@@ -283,15 +285,16 @@ class Main:
                 gem.kill()
 
     def _draw_clock(self):
-        elapsed_time = time.time() - self.start_time
-        minutes = int(elapsed_time // 60)
-        seconds = int(elapsed_time % 60)
-        time_text = f"{minutes:02}:{seconds:02}"
+        if self.start_time is not None:  # 게임 시작 시간이 설정된 경우에만 시간 표시
+            elapsed_time = time.time() - self.start_time
+            minutes = int(elapsed_time // 60)
+            seconds = int(elapsed_time % 60)
+            time_text = f"{minutes:02}:{seconds:02}"
 
-        text_surface = self.font.render(time_text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=(self.screen_width // 2, 80))
+            text_surface = self.font.render(time_text, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(self.screen_width // 2, 80))
 
-        self.screen.blit(text_surface, text_rect)
+            self.screen.blit(text_surface, text_rect)
 
     def _draw_exp_bar(self):
         bar_length = 1300  # 경험치 바 길이
