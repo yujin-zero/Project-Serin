@@ -1,5 +1,6 @@
 import pygame
 
+
 class WingBoots:
     def __init__(self):
         super().__init__()
@@ -14,5 +15,5 @@ class WingBoots:
         boost_amount = self.get_boost_amount()
         base = Serin.base_speed
         base += boost_amount
-        print(Serin.base_speed)
+        # print(Serin.base_speed)
         Serin.speed = base

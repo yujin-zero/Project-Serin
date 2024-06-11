@@ -29,7 +29,8 @@ class LevelUpUI:
         self.status_images = {
             "./image/armor.png": "  피해량 감소",
             "./image/health.png": "  최대 체력 증가",
-            "./image/status.png": "  이동 속도 증가"
+            "./image/wingBoots.png": "  이동 속도 증가",
+            "./image/heart.png": "  피 회복"
         }
 
         self.initialize_buttons()
@@ -95,12 +96,15 @@ class LevelUpUI:
             else:
                 self.game_instance.inventory.add_weapon(
                     self.game_instance.inventory.whip_weapon)
+
         elif item_image_path == "./image/armor.png":
             print("갑옷 버튼이 눌렸습니다.")
         elif item_image_path == "./image/health.png":
             print("체력 버튼이 눌렸습니다.")
-        elif item_image_path == "./image/status.png":
-            print("어쩌구")
+        elif item_image_path == "./image/heart.png":
+            print("피회복 버튼이 눌렸습니다")
+        elif item_image_path == "./image/wingBoots.png":
+            print("이동속도 버튼이 눌렸습니다")
 
         self.active = False
         self.game_instance.paused = False
