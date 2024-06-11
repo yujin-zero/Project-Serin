@@ -26,13 +26,13 @@ class Main:
         self.screen = pygame.display.set_mode(
             (self.screen_width, self.screen_height))
 
-        pygame.display.set_caption("밤의 수호자 세린")
+        pygame.display.set_caption("세린이 키우기")
 
         # 오디오 시스템 초기화
         pygame.mixer.init()
 
         # 배경 음악 로드 및 재생
-        pygame.mixer.music.load("bgm.mp3")
+        pygame.mixer.music.load("./10 - Enemies/audio/main.ogg")
         pygame.mixer.music.set_volume(0.5)  # 볼륨 설정 (0.0 ~ 1.0)
         pygame.mixer.music.play(-1)
 
@@ -292,7 +292,8 @@ class Main:
             time_text = f"{minutes:02}:{seconds:02}"
 
             text_surface = self.font.render(time_text, True, (255, 255, 255))
-            text_rect = text_surface.get_rect(center=(self.screen_width // 2, 80))
+            text_rect = text_surface.get_rect(
+                center=(self.screen_width // 2, 80))
 
             self.screen.blit(text_surface, text_rect)
 
