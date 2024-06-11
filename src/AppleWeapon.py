@@ -64,11 +64,6 @@ class AppleWeapon:
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay[self.level]:
             self.last_shot = now
-            # if self.level < self.maxLevel:
-            #     self.level += 1
-            #     self.add_apples()  # 사과 추가 및 위치 재설정
-            #     for apple in self.apples:
-            #         apple.damage = self.damage[self.level]
 
     def update(self):
         for apple in self.apples:

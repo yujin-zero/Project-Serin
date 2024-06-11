@@ -84,11 +84,6 @@ class Main:
             self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
 
-        # 최대 체력 증가 아이템 초기화
-        self.health_boost_item = HealthBoostItem(50)
-        # 데미지 감소 아이템 초기화
-        self.dagame_recudtion_item = DamageReductionItem(5)
-
         self.damage_texts = pygame.sprite.Group()
 
         self.level_up_ui = LevelUpUI(
@@ -252,10 +247,9 @@ class Main:
         for monster in self.monsters:
             if self.serin.hitbox.colliderect(monster.hitbox):
                 self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
-                if self.inventory.has_damage_reduction_item():
-                    self.serin.health += self.dagame_recudtion_item.damage_reduction
-                    if self.serin.health > self.serin.max_health:
-                        self.serin.health = self.serin.max_health
+
+                if self.inventory.has_damage_reduction():
+                    self.inventory.damage_reduction.update()
 
                 if self.serin.health <= 0:
                     self.serin.kill()

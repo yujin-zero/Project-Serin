@@ -29,7 +29,8 @@ class LevelUpUI:
         self.status_images = {
             "./image/armor.png": "  피해량 감소",
             "./image/health.png": "  최대 체력 증가",
-            "./image/status.png": "  이동 속도 증가"
+            "./image/wingBoots.png": "  이동 속도 증가",
+            "./image/heart.png": "  피 회복"
         }
 
         self.initialize_buttons()
@@ -95,12 +96,48 @@ class LevelUpUI:
             else:
                 self.game_instance.inventory.add_weapon(
                     self.game_instance.inventory.whip_weapon)
+
         elif item_image_path == "./image/armor.png":
             print("갑옷 버튼이 눌렸습니다.")
+            if self.game_instance.inventory.has_damage_reduction():
+                if self.game_instance.inventory.damage_reduction.level < 5:
+                    self.game_instance.inventory.damage_reduction.level += 1
+            else:
+                self.game_instance.inventory.add_item2(
+                    self.game_instance.inventory.damage_reduction
+                )
+
         elif item_image_path == "./image/health.png":
             print("체력 버튼이 눌렸습니다.")
-        elif item_image_path == "./image/status.png":
-            print("어쩌구")
+            if self.game_instance.inventory.has_health_boost():
+                self.game_instance.inventory.health_boost.update(
+                    self.game_instance.serin)
+            else:
+                self.game_instance.inventory.add_item2(
+                    self.game_instance.inventory.health_boost
+                )
+                self.game_instance.inventory.health_boost.update(
+                    self.game_instance.serin)
+        elif item_image_path == "./image/heart.png":
+            print("피회복 버튼이 눌렸습니다")
+            if self.game_instance.inventory.has_heart():
+                self.game_instance.inventory.heart.update(
+                    self.game_instance.serin)
+            else:
+                self.game_instance.inventory.add_item2(
+                    self.game_instance.inventory.heart
+                )
+                self.game_instance.inventory.heart.update(
+                    self.game_instance.serin)
+        elif item_image_path == "./image/wingBoots.png":
+            print("이동속도 버튼이 눌렸습니다")
+            if self.game_instance.inventory.has_wing_boots():
+                if self.game_instance.inventory.wing_boots.level < 5:
+                    self.game_instance.inventory.wing_boots.level += 1
+            else:
+                self.game_instance.inventory.add_item(
+                    self.game_instance.inventory.wing_boots
+                )
 
         self.active = False
         self.game_instance.paused = False

@@ -1,12 +1,15 @@
 import pygame
 
+
 class Serin(pygame.sprite.Sprite):
     def __init__(self, x, y, boundary_width, boundary_height):
         super().__init__()
-        self.original_frames = [pygame.image.load(f'./moving/{i}.png') for i in range(1, 13)]
+        self.original_frames = [pygame.image.load(
+            f'./moving/{i}.png') for i in range(1, 13)]
 
         # 이미지 크기 1.5배로 조정
-        self.frames = [pygame.transform.scale(frame, (int(frame.get_width() * 1.7), int(frame.get_height() * 1.7))) for frame in self.original_frames]
+        self.frames = [pygame.transform.scale(frame, (int(frame.get_width(
+        ) * 1.7), int(frame.get_height() * 1.7))) for frame in self.original_frames]
 
         self.image = self.frames[0]
         self.rect = self.image.get_rect()
@@ -17,7 +20,7 @@ class Serin(pygame.sprite.Sprite):
         self.frame_count = 6
         self.frame_delay = 100
         self.last_update_time = pygame.time.get_ticks()
-        self.direction=1
+        self.direction = 1
 
         self.health = 50
         self.max_health = 50
@@ -36,15 +39,16 @@ class Serin(pygame.sprite.Sprite):
 
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
-            self.direction=-1
+            self.direction = -1
             if current_time - self.last_update_time > self.frame_delay:
                 self.frame_index = (self.frame_index + 1) % self.frame_count
                 self.last_update_time = current_time
         elif keys[pygame.K_RIGHT]:
-            self.direction=1
+            self.direction = 1
             self.rect.x += self.speed
             if current_time - self.last_update_time > self.frame_delay:
-                self.frame_index = 6 + (self.frame_index + 1) % self.frame_count
+                self.frame_index = 6 + \
+                    (self.frame_index + 1) % self.frame_count
                 self.last_update_time = current_time
         else:
             self.frame_index = 0 if self.frame_index < 6 else 6
@@ -55,15 +59,18 @@ class Serin(pygame.sprite.Sprite):
             self.rect.y += self.speed
 
         # 경계 설정
-        self.rect.x = max(0, min(self.rect.x, self.boundary_width - self.rect.width))
-        self.rect.y = max(0, min(self.rect.y, self.boundary_height - self.rect.height))
+        self.rect.x = max(
+            0, min(self.rect.x, self.boundary_width - self.rect.width))
+        self.rect.y = max(
+            0, min(self.rect.y, self.boundary_height - self.rect.height))
 
         self.image = self.frames[self.frame_index]
         # Hitbox 업데이트
         self.hitbox.center = self.rect.center
 
     def draw(self, screen, camera_x, camera_y):
-        screen.blit(self.image, (self.rect.x - camera_x, self.rect.y - camera_y))
+        screen.blit(self.image, (self.rect.x -
+                    camera_x, self.rect.y - camera_y))
         self._draw_health_bar(screen, camera_x, camera_y)
 
     def _draw_health_bar(self, screen, camera_x, camera_y):
@@ -81,5 +88,3 @@ class Serin(pygame.sprite.Sprite):
         # 현재 체력 그리기
         pygame.draw.rect(screen, (0, 255, 0), (health_bar_x, health_bar_y,
                                                current_health_bar_width, self.health_bar_height))
-
-# ... 나머지 게임 루프 및 기타 코드

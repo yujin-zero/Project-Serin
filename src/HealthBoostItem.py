@@ -1,11 +1,12 @@
+import pygame
 
 
 class HealthBoostItem:
-    def __init__(self, health_increase):
-        self.health_increase = health_increase
+    def __init__(self):
+        self.image = pygame.image.load("./image/health.png").convert_alpha()
+        self.level = 0
 
-    def apply(self, character):
-        character.max_health += self.health_increase
-        character.health += self.health_increase
-        if character.health > character.max_health:
-            character.health = character.max_health
+    def update(self, Serin):
+        if self.level < 5:
+            Serin.max_health += 50
+            self.level += 1
