@@ -246,10 +246,15 @@ class Main:
     def _check_collisions(self):
         for monster in self.monsters:
             if self.serin.hitbox.colliderect(monster.hitbox):
-                self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
-
                 if self.inventory.has_damage_reduction():
-                    self.inventory.damage_reduction.update()
+                    temp_health = monster.power * (0.1 *
+                                            (10-self.inventory.damage_reduction.level))
+                    self.serin.health -= temp_health
+                else:
+                    self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
+
+                # if self.inventory.has_damage_reduction():
+                #     self.inventory.damage_reduction.update(self.serin)
 
                 if self.serin.health <= 0:
                     self.serin.kill()

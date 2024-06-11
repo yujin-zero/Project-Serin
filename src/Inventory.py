@@ -81,7 +81,7 @@ class Inventory:
         return any(isinstance(item, Heart) for item in self.item2_list)
 
     def has_damage_reduction(self):
-        return any(isinstance(item, DamageReductionItem) for item in self.item_list)
+        return any(isinstance(item, DamageReductionItem) for item in self.item2_list)
 
     def has_health_boost(self):
         return any(isinstance(item, HealthBoostItem) for item in self.item2_list)
