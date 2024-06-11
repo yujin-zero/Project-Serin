@@ -68,7 +68,6 @@ class Main:
 
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
-        self.start_time = time.time()
 
         self.exp = 0
         self.max_exp = 100
@@ -118,6 +117,8 @@ class Main:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
+                        self.start_time = time.time()  # 게임 시작 시간 설정
+                        self._initialize_game()
                         waiting = False
 
     def show_game_over_screen(self):
@@ -145,6 +146,7 @@ class Main:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
+                        self.start_time = time.time()  # 게임 시작 시간 설정
                         self._initialize_game()  # 게임 재시작
                         waiting = False
 
@@ -172,11 +174,6 @@ class Main:
                     self.paused = False
                 if self.game_over and event.key == pygame.K_r:
                     self._initialize_game()  # 게임 재시작
-#                 if event.key == pygame.K_ESCAPE:
-#                     # ESC로 UI 비활성화 및 게임 재개
-#                     self.level_up_ui.active = False
-#                     self.paused = False 
-
 
     def _update(self):
         if not self.paused:
@@ -254,24 +251,6 @@ class Main:
                     self.game_over = True  # 게임 오버 상태로 설정
 
 
-#             if self.inventory.has_apple_weapon() and self.apple_weapon.rect.colliderect(monster.hitbox):
-#                 damage = 10
-#                 monster.health -= damage
-#                 self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, damage))
-#                 if monster.health <= 0:
-#                     monster.kill()
-#                     self.monster_kills += 1
-#                     self.coin_count += 1
-#                     gem = Gem(monster.rect.centerx, monster.rect.centery)
-#                     self.gems.add(gem)
-#                     self.all_sprites.add(gem)
-
-#             for sprite in self.all_sprites:
-#                 if isinstance(sprite, CarrotWeapon) and sprite.rect.colliderect(monster.hitbox):
-#                     monster.health -= sprite.damage
-#                     self.damage_texts.add(DamageText(monster.rect.centerx, monster.rect.centery, sprite.damage))
-
-
             for weapon in self.weapon_sprites:
                 if weapon.rect.colliderect(monster.hitbox):
                     print(weapon.damage)
@@ -295,15 +274,16 @@ class Main:
                 gem.kill()
 
     def _draw_clock(self):
-        elapsed_time = time.time() - self.start_time
-        minutes = int(elapsed_time // 60)
-        seconds = int(elapsed_time % 60)
-        time_text = f"{minutes:02}:{seconds:02}"
+        if self.start_time is not None:  # 게임 시작 시간이 설정된 경우에만 시간 표시
+            elapsed_time = time.time() - self.start_time
+            minutes = int(elapsed_time // 60)
+            seconds = int(elapsed_time % 60)
+            time_text = f"{minutes:02}:{seconds:02}"
 
-        text_surface = self.font.render(time_text, True, (255, 255, 255))
-        text_rect = text_surface.get_rect(center=(self.screen_width // 2, 80))
+            text_surface = self.font.render(time_text, True, (255, 255, 255))
+            text_rect = text_surface.get_rect(center=(self.screen_width // 2, 80))
 
-        self.screen.blit(text_surface, text_rect)
+            self.screen.blit(text_surface, text_rect)
 
     def _draw_exp_bar(self):
         bar_length = 1300  # 경험치 바 길이
