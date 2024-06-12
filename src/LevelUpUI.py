@@ -22,7 +22,7 @@ class LevelUpUI:
         # 아이템 이미지와 설명 추가 하는 곳
         self.item_images = {"./image/carrot.png": "  당근을 쏠 수 있습니다.",
                             "./image/appleItem.png": "  사과 개수가 증가합니다.",
-                            "./image/grass.png": "  나뭇잎이 사방으로 날라갑니다.",
+                            "./image/leaf.png": "  나뭇잎이 사방으로 날라갑니다.",
                             "./image/whipAttack.png": "  바람이 앞으로 강하게 내리칩니다."
                             }
         # 상태 이미지와 설명 설명 추가 하는 곳
@@ -80,7 +80,7 @@ class LevelUpUI:
             else:
                 self.game_instance.inventory.add_weapon(
                     self.game_instance.inventory.carrot_weapon)
-        elif item_image_path == "./image/grass.png":
+        elif item_image_path == "./image/leaf.png":
             print("풀 버튼이 눌렸습니다.")
             if self.game_instance.inventory.has_leaf_weapon():
                 if self.game_instance.inventory.leaf_weapon.level < 5:

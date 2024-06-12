@@ -5,7 +5,7 @@ class WingBoots:
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load("./image/wingBoots.png").convert_alpha()
-        self.level = 1
+        self.level = 5
 
     def get_boost_amount(self):
         boost_amounts = {1: 1, 2: 2, 3: 3, 4: 4, 5: 5}

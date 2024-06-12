@@ -17,6 +17,7 @@ from LevelUpUI import LevelUpUI
 from DamageReductionItem import DamageReductionItem
 import monster_BOSS
 
+
 class Main:
     def __init__(self):
         pygame.init()
@@ -61,7 +62,7 @@ class Main:
             monster_squirrel.SquirrelMonster)
         self.monster_classes = [
             monster_BamBoo.BamBooMonster, monster_Spirit.SpiritMonster]
-        self.next_monster_time = 5000
+        self.next_monster_time = 60000
         self.last_monster_time = pygame.time.get_ticks()
         self.monster_index = 0
 
@@ -93,6 +94,7 @@ class Main:
 
         self.game_over = False  # 게임 오버 상태 추가
         self.final_score = 0  # 최종 점수 추가
+        self.levelUp = False
 
         # 시작 및 종료 화면 이미지 로드 및 크기 조정
         self.start_screen_image = pygame.transform.scale(pygame.image.load(
@@ -201,15 +203,18 @@ class Main:
                     self.monster_classes[self.monster_index])
                 self.monster_index += 1
                 self.last_monster_time = current_time
-        if self.level==20:
+        if self.level == 20:
             self.monster_spawner.add_monster_class(monster_BOSS.BossMonster)
 
-                
-        if self.level%5==0:
-            for monster in self.monsters:
-                monster.speed += 0.3
-                monster.power += 0.2
-                monster.health += 100
+        if self.level % 5 == 0:
+            if self.levelUp == False:
+                for monster in self.monsters:
+                    monster.speed += 0.3
+                    monster.power += 0.2
+                    monster.health += 100
+                    self.levelUp = True
+        else:
+            self.levelUp = False
         if self.exp >= self.max_exp:
             self.level += 1
             self.exp = 0
@@ -252,7 +257,7 @@ class Main:
             if self.serin.hitbox.colliderect(monster.hitbox):
                 if self.inventory.has_damage_reduction():
                     temp_health = monster.power * (0.1 *
-                                            (10-self.inventory.damage_reduction.level))
+                                                   (10-self.inventory.damage_reduction.level))
                     self.serin.health -= temp_health
                 else:
                     self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
