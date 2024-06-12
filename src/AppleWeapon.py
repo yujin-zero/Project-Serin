@@ -36,7 +36,7 @@ class AppleWeapon:
         self.all_sprite = all_sprite
         self.last_shot = pygame.time.get_ticks()
         self.shoot_delay = [0, 1000, 900, 800, 700, 600]
-        self.damage = [0, 20, 20, 25, 25, 30]
+        self.damage = [0, 25, 30, 35, 40, 45]
         self.level = 1
         self.maxLevel = 5
         self.radius = 80
