@@ -18,6 +18,9 @@ class Monster(pygame.sprite.Sprite):
         self.animation_time = pygame.time.get_ticks()
         self.animation_delay = 100  # 밀리초 단위로 애니메이션 지연 시간 설정
         self.hitbox = self.rect.inflate(-10, -10)
+        self.invulnerable = False
+        self.invulnerable_time = 250
+        self.last_hit_time = 0  # 마지막 피격 시간
 
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -26,6 +29,11 @@ class Monster(pygame.sprite.Sprite):
             self.animation_index = (
                 self.animation_index + 1) % len(self.images)
             self.image = self.images[self.animation_index]
+        
+        #무적시간이 지나면 무적 비활성화
+        if current_time - self.last_hit_time > self.invulnerable_time:
+            self.invulnerable = False  
+
 
         # 플레이어의 중심을 향해 이동
         dx = self.player.rect.centerx - self.rect.centerx
@@ -41,6 +49,14 @@ class Monster(pygame.sprite.Sprite):
         self.hitbox.center = self.rect.center
         if self.health <= 0:
             self.kill()
+    
+    def hit(self, damage):
+        if not self.invulnerable:  # 몬스터가 무적 상태가 아닌 경우에만 피격 효과 적용
+            # 피격 효과 및 무적 상태 활성화
+            self.health -= damage
+            self.invulnerable = True
+            self.last_hit_time = pygame.time.get_ticks()
+
 
     def draw(self, screen, camera_x, camera_y):
         screen.blit(self.image, (self.rect.x - camera_x, self.rect.y - camera_y))

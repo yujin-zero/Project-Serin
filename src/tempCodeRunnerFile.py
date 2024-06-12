@@ -84,6 +84,11 @@ class Main:
             self.serin, self.screen, self.weapon_sprites)
         self.ui = Ui(self.inventory, self.screen)
 
+        # 최대 체력 증가 아이템 초기화
+        self.health_boost_item = HealthBoostItem(50)
+        # 데미지 감소 아이템 초기화
+        self.dagame_recudtion_item = DamageReductionItem(5)
+
         self.damage_texts = pygame.sprite.Group()
 
         self.level_up_ui = LevelUpUI(
@@ -210,7 +215,6 @@ class Main:
         if self.exp >= self.max_exp:
             self.level += 1
             self.exp = 0
-            self.max_exp *= 1.4
             if self.level % 1 == 0:
                 self.level_up_ui.activate()
                 self.paused = True
@@ -247,15 +251,11 @@ class Main:
     def _check_collisions(self):
         for monster in self.monsters:
             if self.serin.hitbox.colliderect(monster.hitbox):
-                if self.inventory.has_damage_reduction():
-                    temp_health = monster.power * (0.1 *
-                                            (10-self.inventory.damage_reduction.level))
-                    self.serin.health -= temp_health
-                else:
-                    self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
-
-                # if self.inventory.has_damage_reduction():
-                #     self.inventory.damage_reduction.update(self.serin)
+                self.serin.health -= monster.power  # 몬스터의 공격력에 따라 체력 감소
+                if self.inventory.has_damage_reduction_item():
+                    self.serin.health += self.dagame_recudtion_item.damage_reduction
+                    if self.serin.health > self.serin.max_health:
+                        self.serin.health = self.serin.max_health
 
                 if self.serin.health <= 0:
                     self.serin.kill()
@@ -266,10 +266,9 @@ class Main:
                 if weapon.rect.colliderect(monster.hitbox):
                     # print(weapon.damage)
                     damage = weapon.damage
-                    if not monster.invulnerable:
-                        self.damage_texts.add(DamageText(
-                            monster.rect.centerx, monster.rect.centery, damage))
-                    monster.hit(damage)
+                    monster.health -= damage
+                    self.damage_texts.add(DamageText(
+                        monster.rect.centerx, monster.rect.centery, damage))
 
                     if monster.health <= 0:
                         monster.kill()
