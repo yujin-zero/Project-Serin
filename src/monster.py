@@ -21,6 +21,8 @@ class Monster(pygame.sprite.Sprite):
         self.invulnerable = False
         self.invulnerable_time = 250
         self.last_hit_time = 0  # 마지막 피격 시간
+        self.sound = pygame.mixer.Sound("sound/hit.wav")
+        self.sound.set_volume(0.1)
 
     def update(self):
         current_time = pygame.time.get_ticks()
@@ -56,6 +58,7 @@ class Monster(pygame.sprite.Sprite):
             self.health -= damage
             self.invulnerable = True
             self.last_hit_time = pygame.time.get_ticks()
+            self.sound.play()
 
 
     def draw(self, screen, camera_x, camera_y):

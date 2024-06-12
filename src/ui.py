@@ -2,7 +2,7 @@ import pygame
 
 
 class Ui:
-    def __init__(self,  inventory, screen):
+    def __init__(self,  inventory, screen ):
         self.inventory = inventory
         self.screen = screen
         self.font = pygame.font.Font(None, 24)

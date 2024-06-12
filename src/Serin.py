@@ -30,6 +30,9 @@ class Serin(pygame.sprite.Sprite):
         self.boundary_width = boundary_width
         self.boundary_height = boundary_height
 
+        self.invulnerable = False
+
+
         # Hitbox 설정 (원래 rect보다 작은 크기)
         self.hitbox = self.rect.inflate(-75, -45)  # 너비와 높이를 각각 100픽셀 줄임
 
