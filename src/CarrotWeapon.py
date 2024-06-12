@@ -46,7 +46,7 @@ class CarrotWeapon(pygame.sprite.Sprite):
         self.serin = serin
         self.radius = 0
         self.speed = 10
-        self.base_damage = 10
+        self.base_damage = 20
         self.damage = self.base_damage
         self.base_carrot_fire_interval = 1.0
         self.carrot_fire_interval = self.base_carrot_fire_interval
