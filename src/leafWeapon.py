@@ -21,8 +21,6 @@ class Leaf(pygame.sprite.Sprite):
         # 2초가 지나면 삭제
         if pygame.time.get_ticks() - self.creation_time > 2000:
             self.kill()
-        self.image = pygame.transform.rotate(self.image, -math.degrees(0.05))
-        self.rect = self.image.get_rect(center=self.rect.center)
 
     def draw(self, screen, camera_x, camera_y):
         screen.blit(self.image, (self.rect.x -

@@ -215,7 +215,6 @@ class Main:
         if self.exp >= self.max_exp:
             self.level += 1
             self.exp = 0
-            self.max_exp *= 1.4
             if self.level % 1 == 0:
                 self.level_up_ui.activate()
                 self.paused = True
@@ -267,10 +266,9 @@ class Main:
                 if weapon.rect.colliderect(monster.hitbox):
                     # print(weapon.damage)
                     damage = weapon.damage
-                    if not monster.invulnerable:
-                        self.damage_texts.add(DamageText(
-                            monster.rect.centerx, monster.rect.centery, damage))
-                    monster.hit(damage)
+                    monster.health -= damage
+                    self.damage_texts.add(DamageText(
+                        monster.rect.centerx, monster.rect.centery, damage))
 
                     if monster.health <= 0:
                         monster.kill()
