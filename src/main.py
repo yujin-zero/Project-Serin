@@ -73,7 +73,7 @@ class Main:
         self.font = pygame.font.Font(None, 36)
 
         self.exp = 0
-        self.max_exp = 100
+        self.max_exp = 60
 
         self.level = 1
         self.monster_kills = 0
@@ -218,10 +218,13 @@ class Main:
         if self.exp >= self.max_exp:
             self.level += 1
             self.exp = 0
-            self.max_exp *= 1.4
+            self.max_exp *= 1.2
             if self.level % 1 == 0:
+                self.serin.invulnerable = True
                 self.level_up_ui.activate()
                 self.paused = True
+                self.serin.invulnerable = False
+
 
     def _draw(self):
 

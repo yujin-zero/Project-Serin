@@ -35,6 +35,7 @@ class LevelUpUI:
 
         self.initialize_buttons()
 
+
     def initialize_buttons(self):
         # 랜덤 선택을 위해 이미지 경로와 텍스트를 직접 추출
         item_image_path, item_text = random.choice(
