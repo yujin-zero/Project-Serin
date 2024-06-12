@@ -8,7 +8,7 @@ class WhipWeapon:
         self.screen = screen
         self.last_shot = pygame.time.get_ticks()
         self.shoot_delay = [0, 1000, 900, 900, 800, 700]
-        self.damage = [0, 10, 15, 15, 20, 25]
+        self.damage = [0, 20, 20, 25, 30, 30]
         self.level = 1
         self.image = pygame.image.load(
             "./image/whipAttack.png").convert_alpha()
@@ -19,6 +19,8 @@ class WhipWeapon:
             pygame.image.load(f"./image/whip/whipAttack2.png").convert_alpha(),
             pygame.image.load(f"./image/whip/whipAttack3.png").convert_alpha(),
         ]
+        
+        self.sound = pygame.mixer.Sound("sound/sword_swing.wav")
 
     def attack(self):
         if self.level == 0:
@@ -41,6 +43,7 @@ class WhipWeapon:
                             30, base_angle, self.damage[self.level], images)
 
             self.all_sprites.add(whip)
+            self.sound.play()
 
 
 class Whip(pygame.sprite.Sprite):
