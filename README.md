@@ -70,13 +70,19 @@ python main.py
 - **monster_squirrel.py, monster_BamBoo.py, monster_Spirit.py**: 다양한 몬스터 클래스.
 - **ui.py**: 사용자 인터페이스 요소를 관리합니다.
 - **Inventory.py**: 인벤토리 시스템을 관리합니다.
-- **AppleWeapon.py, CarrotWeapon.py**: 다양한 무기 클래스.
+- **AppleWeapon.py**: 사과가 돌며 몹을 공격하는 무기.
+- **CarrotWeapon.py**: 당근이 총처럼 쏴지며 공격하는 무기.
+- **WhipWeapon.py**: 채찍이 앞에 있는 몹을 공격하는 무기.
+- **LeafWeapon.py**: 나뭇잎이 사방으로 발사되며 공격하는 무기.
+- **WingBoots.py**: 이동속도를 증가시키는 아이템.
+- **Heart.py**: 피회복 아이템
 - **HealthBoostItem.py**: 최대 체력을 증가시키는 아이템.
+- **DamageReductionItem.py**: 받는 피해를 줄이는 아이템.
 - **DamageText.py**: 데미지 텍스트를 표시합니다.
 - **Gem.py**: 경험치 젬을 처리합니다.
 - **LevelUpUI.py**: 레벨업 UI 요소를 관리합니다.
 - **Button.py** : 레벨업 UI안에 버튼을 관리합니다.
-- **DamageReductionItem.py**: 받는 피해를 줄이는 아이템.
+
 
 
 ## 참고 사항
@@ -85,6 +91,8 @@ python main.py
 
 ## 저자
 - **개발자**: [소유진], [하윤철], [김시원], [윤의종]
-- **이메일**: [https://github.com/poly30] , [https://github.com/Yooncheol1], [https://github.com/huro0906],[https://github.com/Dochanii]
+- **이메일**: [https://github.com/yujin-zero] , [https://github.com/Yooncheol1], [https://github.com/huro0906],[https://github.com/Dochanii]
 
-게임을 즐기세요!
+레벨 20을 달성하여 교수님 몬스터를 만나보세요!
+
+![Example Image](https://github.com/yujin-zero/Project-Serin/blob/main/image/ending.png)
