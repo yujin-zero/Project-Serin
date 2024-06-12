@@ -15,7 +15,7 @@ from DamageText import DamageText  # 데미지 표시
 from Gem import Gem  # 경험치
 from LevelUpUI import LevelUpUI
 from DamageReductionItem import DamageReductionItem
-
+import monster_BOSS
 
 class Main:
     def __init__(self):
@@ -61,7 +61,7 @@ class Main:
             monster_squirrel.SquirrelMonster)
         self.monster_classes = [
             monster_BamBoo.BamBooMonster, monster_Spirit.SpiritMonster]
-        self.next_monster_time = 60000
+        self.next_monster_time = 5000
         self.last_monster_time = pygame.time.get_ticks()
         self.monster_index = 0
 
@@ -201,12 +201,15 @@ class Main:
                     self.monster_classes[self.monster_index])
                 self.monster_index += 1
                 self.last_monster_time = current_time
-        if current_time % 10000 == 0 and self.monster_index > 1:
+        if self.level==20:
+            self.monster_spawner.add_monster_class(monster_BOSS.BossMonster)
+
+                
+        if self.level%5==0:
             for monster in self.monsters:
                 monster.speed += 0.3
                 monster.power += 0.2
                 monster.health += 100
-
         if self.exp >= self.max_exp:
             self.level += 1
             self.exp = 0

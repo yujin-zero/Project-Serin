@@ -12,7 +12,7 @@ class MonsterSpawner:
         self.last_spawn_time = pygame.time.get_ticks()
         self.start_time = pygame.time.get_ticks()
         self.monster_classes = []  # 생성할 몬스터 클래스 리스트
-
+        
     def add_monster_class(self, monster_class):
         self.monster_classes.append(monster_class)
 
